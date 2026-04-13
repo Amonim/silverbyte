@@ -1204,6 +1204,13 @@ textarea {
   opacity: 0.8;
 }
 
+.cart-card__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
 .cart-card__total {
   font-size: 22px;
   font-weight: 700;
@@ -1304,8 +1311,11 @@ textarea {
     grid-template-columns: 120px minmax(0, 1fr);
   }
 
-  .cart-card__total {
+  .cart-card__actions {
     grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
   }
 }
 

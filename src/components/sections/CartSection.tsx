@@ -86,19 +86,21 @@ function CartSection() {
                           +
                         </button>
                       </div>
-
-                      <button
-                        type="button"
-                        className="cart-card__remove"
-                        onClick={() => removeFromCart(item.id)}
-                      >
-                        Удалить
-                      </button>
                     </div>
                   </div>
 
-                  <div className="cart-card__total">
-                    {(item.price * item.quantity).toLocaleString()} ₸
+                  <div className="cart-card__actions">
+                    <div className="cart-card__total">
+                      {(item.price * item.quantity).toLocaleString()} ₸
+                    </div>
+
+                    <button
+                      type="button"
+                      className="cart-card__remove"
+                      onClick={() => removeFromCart(item.id)}
+                    >
+                      Удалить
+                    </button>
                   </div>
                 </article>
               ))}
