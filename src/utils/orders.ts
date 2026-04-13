@@ -1,9 +1,7 @@
 import type { Order } from "../types/order";
 
-const ORDERS_KEY = "silverbyte_orders";
-
-export function getOrders(): Order[] {
-  const rawOrders = localStorage.getItem(ORDERS_KEY);
+export function getOrders(userId: string): Order[] {
+  const rawOrders = localStorage.getItem(`orders_${userId}`);
 
   if (!rawOrders) {
     return [];
@@ -16,10 +14,10 @@ export function getOrders(): Order[] {
   }
 }
 
-export function saveOrder(order: Order): void {
-  const orders = getOrders();
+export function saveOrder(order: Order, userId: string): void {
+  const orders = getOrders(userId);
   orders.push(order);
-  localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+  localStorage.setItem(`orders_${userId}`, JSON.stringify(orders));
   window.dispatchEvent(new Event("orders-updated"));
 }
 

@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import useCart from "../../hooks/useCart";
+import useAuth from "../../hooks/useAuth";
 import { saveOrder, createOrderNumber } from "../../utils/orders";
 import type { OrderCustomerInfo } from "../../types/order";
 
 function CheckoutSection() {
   const { items, total, clearCart } = useCart();
+  const { user, authenticated } = useAuth();
   const [successOrder, setSuccessOrder] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<OrderCustomerInfo>({
@@ -26,7 +28,7 @@ function CheckoutSection() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (items.length === 0) return;
+    if (items.length === 0 || !user) return;
 
     const newOrderNumber = createOrderNumber();
     const newOrder = {
@@ -40,7 +42,7 @@ function CheckoutSection() {
       status: "pending" as const,
     };
 
-    saveOrder(newOrder);
+    saveOrder(newOrder, user.id);
     clearCart();
     setSuccessOrder(newOrderNumber);
   };
@@ -61,6 +63,29 @@ function CheckoutSection() {
               </Link>
               <Link to="/catalog" className="checkout__button checkout__button--outline">
                 Вернуться в каталог
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!authenticated) {
+    return (
+      <section className="checkout">
+        <div className="container checkout__container">
+          <div className="checkout__empty">
+            <h2 className="checkout__empty-title">Требуется авторизация</h2>
+            <p className="checkout__empty-text">
+              Чтобы оформить заказ, войдите в аккаунт
+            </p>
+            <div className="checkout__success-actions">
+              <Link to="/login" className="checkout__button">
+                Войти
+              </Link>
+              <Link to="/register" className="checkout__button checkout__button--outline">
+                Регистрация
               </Link>
             </div>
           </div>
