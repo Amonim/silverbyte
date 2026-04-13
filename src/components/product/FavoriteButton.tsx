@@ -1,0 +1,41 @@
+import useFavorites from "../../hooks/useFavorites";
+
+type FavoriteButtonProps = {
+  productId: number;
+  className?: string;
+};
+
+function FavoriteButton({ productId, className = "" }: FavoriteButtonProps) {
+  const { favorites, toggleFavorite } = useFavorites();
+  const isFav = favorites.includes(productId);
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigating if wrapped in a link
+    e.stopPropagation(); // Prevent triggering parent clicks
+    toggleFavorite(productId);
+  };
+
+  return (
+    <button
+      className={`favorite-btn ${isFav ? "favorite-btn--active" : ""} ${className}`}
+      onClick={handleClick}
+      aria-label="В избранное"
+      title="Добавить в избранное"
+    >
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill={isFav ? "currentColor" : "none"}
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+    </button>
+  );
+}
+
+export default FavoriteButton;
