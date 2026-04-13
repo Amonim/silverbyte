@@ -527,7 +527,7 @@ textarea {
 .catalog-card__title {
   font-size: 17px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin: 8px 0;
 }
 
 .catalog-card__price {
@@ -1415,6 +1415,14 @@ textarea {
 .auth__link {
   color: var(--color-primary);
 }
+
+
+
+
+
+
+
+
 
 /* FAVORITES */
 .favorite-btn {
