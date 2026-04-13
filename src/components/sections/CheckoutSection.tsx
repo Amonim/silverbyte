@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useCart from "../../hooks/useCart";
 import useAuth from "../../hooks/useAuth";
 import { saveOrder, createOrderNumber } from "../../utils/orders";
@@ -8,7 +8,9 @@ import type { OrderCustomerInfo } from "../../types/order";
 function CheckoutSection() {
   const { items, total, clearCart } = useCart();
   const { user, authenticated } = useAuth();
+  const navigate = useNavigate();
   const [successOrder, setSuccessOrder] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const [formData, setFormData] = useState<OrderCustomerInfo>({
     fullName: "",
@@ -23,12 +25,51 @@ function CheckoutSection() {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (items.length === 0 || !user) return;
+
+    const newErrors: { [key: string]: string } = {};
+
+    const fullNameTrimmed = formData.fullName.trim();
+    if (!fullNameTrimmed) {
+      newErrors.fullName = "Поле обязательно для заполнения";
+    } else if (fullNameTrimmed.length < 4 || fullNameTrimmed.split(/\s+/).length < 2) {
+      newErrors.fullName = "Минимум 2 слова (имя и фамилия), не менее 4 символов";
+    }
+
+    const phoneTrimmed = formData.phone.trim();
+    if (!phoneTrimmed) {
+      newErrors.phone = "Поле обязательно для заполнения";
+    } else if (!/^\+\d{10,}$/.test(phoneTrimmed)) {
+      newErrors.phone = "Только цифры, должен начинаться с +, минимум 10 цифр";
+    }
+
+    const cityTrimmed = formData.city.trim();
+    if (!cityTrimmed) {
+      newErrors.city = "Поле обязательно для заполнения";
+    } else if (cityTrimmed.length < 2) {
+      newErrors.city = "Минимум 2 символа";
+    }
+
+    const addressTrimmed = formData.address.trim();
+    if (!addressTrimmed) {
+      newErrors.address = "Поле обязательно для заполнения";
+    } else if (addressTrimmed.length < 5) {
+      newErrors.address = "Минимум 5 символов";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
     const newOrderNumber = createOrderNumber();
     const newOrder = {
@@ -42,9 +83,9 @@ function CheckoutSection() {
       status: "pending" as const,
     };
 
-    saveOrder(newOrder, user.id);
+    saveOrder(newOrder, user.email);
     clearCart();
-    setSuccessOrder(newOrderNumber);
+    navigate("/profile");
   };
 
   if (successOrder) {
@@ -135,6 +176,7 @@ function CheckoutSection() {
                 onChange={handleChange}
                 required
               />
+              {errors.fullName && <div style={{ color: "red", fontSize: "14px", marginTop: "-10px", marginBottom: "15px" }}>{errors.fullName}</div>}
 
               <input
                 type="tel"
@@ -145,6 +187,7 @@ function CheckoutSection() {
                 onChange={handleChange}
                 required
               />
+              {errors.phone && <div style={{ color: "red", fontSize: "14px", marginTop: "-10px", marginBottom: "15px" }}>{errors.phone}</div>}
 
               <input
                 type="text"
@@ -155,6 +198,7 @@ function CheckoutSection() {
                 onChange={handleChange}
                 required
               />
+              {errors.city && <div style={{ color: "red", fontSize: "14px", marginTop: "-10px", marginBottom: "15px" }}>{errors.city}</div>}
 
               <input
                 type="text"
@@ -165,6 +209,7 @@ function CheckoutSection() {
                 onChange={handleChange}
                 required
               />
+              {errors.address && <div style={{ color: "red", fontSize: "14px", marginTop: "-10px", marginBottom: "15px" }}>{errors.address}</div>}
 
               <textarea
                 name="comment"

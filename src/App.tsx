@@ -8,6 +8,7 @@ import RegisterPage from "./components/pages/RegisterPage";
 import FavoritesPage from "./components/pages/FavoritesPage";
 import ScrollToTop from "./components/ScrollToTop";
 import CheckoutPage from "./components/pages/CheckoutPage";
+import ProfilePage from "./components/pages/ProfilePage";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/favorites" element={<FavoritesPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </BrowserRouter>
   );

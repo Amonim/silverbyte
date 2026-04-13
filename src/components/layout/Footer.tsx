@@ -47,8 +47,8 @@ function Footer() {
           <div className="footer__column">
             <h4 className="footer__title">Контакты</h4>
             <p className="footer__text">Павлодар, Казахстан</p>
-            <p className="footer__text">+7 777 777 77 77</p>
-            <p className="footer__text">support@silverbyte.kz</p>
+            <p className="footer__text">+7 776 148 81 04</p>
+            <p className="footer__text">SilverByte@gmail.com</p>
           </div>
         </div>
 

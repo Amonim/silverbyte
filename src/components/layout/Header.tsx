@@ -105,7 +105,7 @@ function Header() {
               </>
             ) : (
               <>
-                <span className="header-user">{user?.name}</span>
+                <Link to="/profile" className="header-user">{user?.name}</Link>
 
                 <button
                   className="header-link"
