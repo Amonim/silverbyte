@@ -7,12 +7,14 @@ import LoginPage from "./components/pages/LoginPage";
 import RegisterPage from "./components/pages/RegisterPage";
 import FavoritesPage from "./components/pages/FavoritesPage";
 import ScrollToTop from "./components/ScrollToTop";
+import CheckoutPage from "./components/pages/CheckoutPage";
 
 function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
       <Routes>
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/" element={<Home />} />
         <Route path="/catalog" element={<Catalog />} />
         <Route path="/product/:id" element={<Product />} />
