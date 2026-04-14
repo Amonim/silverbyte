@@ -3,6 +3,7 @@ import Footer from "../layout/Footer";
 import Hero from "../home/Hero";
 import Features from "../home/Features";
 import PopularProducts from "../home/PopularProducts";
+import ChatBotSection from "../sections/ChatBotSection";
 
 function Home() {
   return (
@@ -12,6 +13,7 @@ function Home() {
       <Features />
       <PopularProducts />
       <Footer />
+      <ChatBotSection />
     </>
   );
 }
