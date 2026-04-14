@@ -2281,3 +2281,25 @@ textarea {
 [data-theme="light"] .theme-toggle__slider {
   transform: translateX(24px);
 }
+
+/* LIGHT THEME OVERRIDES FOR HEADER AND HERO */
+
+/* Fix faded logo icon in light theme */
+[data-theme="light"] .logo-icon svg {
+  stroke: var(--color-primary);
+}
+
+/* Ensure header links are sharper in light theme */
+[data-theme="light"] .header-link {
+  color: #475569;
+  font-weight: 500;
+}
+
+[data-theme="light"] .header-link:hover {
+  color: var(--color-primary);
+}
+
+/* Improve Hero overlay to reduce harsh contrast and make typography readable */
+[data-theme="light"] .hero::before {
+  background: rgba(255, 255, 255, 0.85);
+}
