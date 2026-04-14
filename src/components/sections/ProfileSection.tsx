@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import useProfile from "../../hooks/useProfile";
+import { cancelOrder } from "../../utils/orders";
 
 function ProfileSection() {
   const { user, authenticated, logoutUser } = useAuth();
@@ -107,8 +108,17 @@ function ProfileSection() {
                       </div>
                       <div className="profile__order-footer">
                         <span className={`profile__order-status profile__order-status--${order.status}`}>
-                          {order.status === 'pending' ? 'В обработке' : order.status}
+                          {order.status === 'pending' ? 'В обработке' : order.status === 'cancelled' ? 'Отменён' : order.status}
                         </span>
+                        {order.status !== 'cancelled' && (
+                          <button 
+                            className="profile__button profile__button--outline"
+                            style={{ marginLeft: '10px', padding: '4px 12px', fontSize: '12px' }}
+                            onClick={() => cancelOrder(order.id, user.id)}
+                          >
+                            Отменить заказ
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}

@@ -24,3 +24,13 @@ export function saveOrder(order: Order, userId: string): void {
 export function createOrderNumber(): string {
   return `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
 }
+
+export function cancelOrder(orderId: string, userId: string): void {
+  const orders = getOrders(userId);
+  const orderIndex = orders.findIndex(o => o.id === orderId);
+  if (orderIndex !== -1) {
+    orders[orderIndex].status = "cancelled";
+    localStorage.setItem(`orders_${userId}`, JSON.stringify(orders));
+    window.dispatchEvent(new Event("orders-updated"));
+  }
+}
