@@ -1,11 +1,25 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import useProfile from "../../hooks/useProfile";
-import { cancelOrder } from "../../utils/orders";
+import { cancelOrder, getOrders } from "../../utils/orders";
 
 function ProfileSection() {
   const { user, authenticated, logoutUser } = useAuth();
-  const { orders, stats } = useProfile();
+  const { orders: initialOrders, stats } = useProfile();
+
+  const [orders, setOrders] = useState(initialOrders);
+
+  useEffect(() => {
+    setOrders(initialOrders);
+  }, [initialOrders]);
+
+  const handleCancelClick = (orderId: string) => {
+    if (user) {
+      cancelOrder(orderId, user.email);
+      setOrders(getOrders(user.email));
+    }
+  };
 
   if (!authenticated || !user) {
     return (
@@ -114,7 +128,7 @@ function ProfileSection() {
                           <button 
                             className="profile__button profile__button--outline"
                             style={{ marginLeft: '10px', padding: '4px 12px', fontSize: '12px' }}
-                            onClick={() => cancelOrder(order.id, user.id)}
+                            onClick={() => handleCancelClick(order.id)}
                           >
                             Отменить заказ
                           </button>
