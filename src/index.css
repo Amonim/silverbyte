@@ -2327,3 +2327,44 @@ textarea {
   background: #f8fafc;
   border-color: var(--color-primary);
 }
+
+/* LIGHT THEME OVERRIDES FOR CIRCULAR ICON BUTTONS AND ADD-TO-CART */
+[data-theme="light"] .catalog-card__fav-btn,
+[data-theme="light"] .catalog-card__arrow,
+[data-theme="light"] .product-preview__close,
+[data-theme="light"] .product-preview__arrow {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .catalog-card__fav-btn:hover,
+[data-theme="light"] .catalog-card__arrow:hover,
+[data-theme="light"] .product-preview__close:hover,
+[data-theme="light"] .product-preview__arrow:hover {
+  background: #f8fafc;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* Ensure active favorite icons are visible within the new light background */
+[data-theme="light"] .favorite-btn--active.catalog-card__fav-btn {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+/* Upgrade Add-to-Cart buttons in light theme to use a premium primary gradient */
+[data-theme="light"] .catalog-card__button {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border: none;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="light"] .catalog-card__button:hover {
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
+  transform: translateY(-2px);
+}
