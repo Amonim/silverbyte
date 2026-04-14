@@ -2311,3 +2311,19 @@ textarea {
 [data-theme="light"] .hero__text {
   color: #cbd5e1;
 }
+
+/* LIGHT THEME OVERRIDES FOR CHECKOUT INPUTS */
+[data-theme="light"] .checkout__input {
+  background: #ffffff;
+  color: var(--color-text);
+}
+
+[data-theme="light"] .checkout__input::placeholder {
+  color: #94a3b8;
+}
+
+[data-theme="light"] .checkout__input:focus,
+[data-theme="light"] .checkout__input:hover {
+  background: #f8fafc;
+  border-color: var(--color-primary);
+}
