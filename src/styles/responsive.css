@@ -117,7 +117,6 @@
   }
 }
 
-/* HEADER RESPONSIVE */
 
 @media (max-width: 1024px) {
   .header .container {
@@ -224,7 +223,7 @@
 
 @media (max-width: 480px) {
 
-  /* Prevent horizontal overflow causing empty right space */
+
   html,
   body {
     overflow-x: hidden;
@@ -260,7 +259,7 @@
     font-size: 12px;
   }
 
-  /* Keep Hero elements within viewport */
+
   .hero__content {
     max-width: 100%;
   }
@@ -270,7 +269,7 @@
     word-wrap: break-word;
   }
 
-  /* Unwrap rigid desktop grids to prevent layout stretching */
+
   .features__grid,
   .footer__grid,
   .catalog__layout,
@@ -284,7 +283,6 @@
     padding: 16px;
   }
 
-  /* Adjust Chatbot so it doesn't overflow or block too much */
   .chatbot-wrapper {
     bottom: 16px;
     right: 16px;
@@ -300,7 +298,6 @@
     max-width: 320px;
   }
 
-  /* Footer improvements - Compact Mobile Version */
   .footer {
     padding: 24px 0 16px;
   }

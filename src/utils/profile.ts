@@ -5,27 +5,24 @@ import { getFavorites } from "./favorites";
 const LEVELS = [0, 300, 700, 1500];
 
 export function calculateProfileStats(orders: Order[]): ProfileStats {
-  let points = 100; // Registration bonus
+  let points = 100;
 
   if (orders.length > 0) {
-    points += 200; // First order bonus
+    points += 200;
   }
 
-  // Add 100 points per every other order to make "Active user" achievable
   points += Math.max(0, orders.length - 1) * 100;
 
-  // Level calculation
   let level = 1;
   let nextLevelPoints = LEVELS[1];
-  
+
   for (let i = 0; i < LEVELS.length; i++) {
     if (points >= LEVELS[i]) {
       level = i + 1;
-      nextLevelPoints = LEVELS[i + 1] || LEVELS[LEVELS.length - 1]; // Cap at max level
+      nextLevelPoints = LEVELS[i + 1] || LEVELS[LEVELS.length - 1];
     }
   }
 
-  // Progress to next level percentage
   let progressToNext = 100;
   if (level < LEVELS.length) {
     const currentLevelPoints = LEVELS[level - 1];
@@ -35,7 +32,6 @@ export function calculateProfileStats(orders: Order[]): ProfileStats {
     );
   }
 
-  // Achievements
   const favoritesCount = getFavorites().length;
 
   const achievements: Achievement[] = [

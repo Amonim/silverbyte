@@ -226,7 +226,6 @@
   background: var(--color-accent);
 }
 
-/* LIGHT THEME OVERRIDES FOR CIRCULAR ICON BUTTONS AND ADD-TO-CART */
 
 [data-theme="light"] .catalog-card__fav-btn,
 [data-theme="light"] .catalog-card__arrow,
@@ -248,7 +247,6 @@
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
 
-/* Ensure active favorite icons are visible within the new light background */
 
 [data-theme="light"] .favorite-btn--active.catalog-card__fav-btn {
   color: #ef4444;
@@ -257,7 +255,6 @@
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
 }
 
-/* Upgrade Add-to-Cart buttons in light theme to use a premium primary gradient */
 
 [data-theme="light"] .catalog-card__button {
   background: linear-gradient(90deg, var(--color-primary), var(--color-accent));

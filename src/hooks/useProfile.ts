@@ -24,7 +24,6 @@ export default function useProfile() {
 
     updateProfileData();
 
-    // Listen to orders and favorites updates to recalculate achievements
     window.addEventListener("orders-updated", updateProfileData);
     window.addEventListener("favorites-updated", updateProfileData);
     window.addEventListener("storage", updateProfileData);

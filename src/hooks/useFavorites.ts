@@ -12,7 +12,6 @@ function useFavorites() {
     window.addEventListener("favorites-updated", syncFavorites);
     window.addEventListener("storage", syncFavorites);
 
-    // Also listen to auth-updated to sync favorites when user logs in/out
     window.addEventListener("auth-updated", syncFavorites);
 
     return () => {

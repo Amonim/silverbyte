@@ -10,8 +10,8 @@ function FavoriteButton({ productId, className = "" }: FavoriteButtonProps) {
   const isFav = favorites.includes(productId);
 
   const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent navigating if wrapped in a link
-    e.stopPropagation(); // Prevent triggering parent clicks
+    e.preventDefault();
+    e.stopPropagation();
     toggleFavorite(productId);
   };
 

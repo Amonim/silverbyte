@@ -33,7 +33,6 @@ export default function ProductSection() {
       <section className="product">
         <div className="container">
           <div className="product__layout">
-            {/* ГАЛЕРЕЯ */}
             <div className="product__gallery">
               <div
                 className="product__main"
@@ -64,7 +63,6 @@ export default function ProductSection() {
               </div>
             </div>
 
-            {/* ИНФО */}
             <div className="product__info">
               <span className="product__badge">{product.specs.category}</span>
 
@@ -89,7 +87,6 @@ export default function ProductSection() {
             </div>
           </div>
 
-          {/* ХАРАКТЕРИСТИКИ */}
           <div className="product__specs">
             <h2 className="product__specs-title">Характеристики</h2>
 
@@ -112,12 +109,10 @@ export default function ProductSection() {
             </div>
           </div>
 
-          {/* Похожие товары */}
           <RelatedProduct relatedProducts={relatedProducts} />
         </div>
       </section>
 
-      {/* МОДАЛКА */}
       {isPreviewOpen && (
         <div
           className="product-preview"
