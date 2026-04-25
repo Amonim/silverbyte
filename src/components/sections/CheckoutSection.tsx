@@ -93,8 +93,7 @@ function CheckoutSection() {
 
     const finalOrder = { ...newOrder, userEmail: user.email };
 
-    // Send to backend and also save locally for immediate UI update/fallback
-    createOrder(finalOrder).catch(err => console.error("Backend order creation failed:", err));
+    createOrder(finalOrder).catch(err => console.error(err));
     
     saveOrder(newOrder, user.email);
     clearCart();

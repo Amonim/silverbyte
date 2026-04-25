@@ -12,10 +12,6 @@ import CheckoutPage from "./components/pages/CheckoutPage";
 import ProfilePage from "./components/pages/ProfilePage";
 
 function App() {
-  useEffect(() => {
-    localStorage.setItem('dailyVisit', new Date().toISOString().split('T')[0]);
-  }, []);
-
   return (
     <BrowserRouter>
       <ScrollToTop />

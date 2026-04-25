@@ -1,28 +1,9 @@
 import type { CurrentUser, User } from '../types/auth'
 
-const USERS_KEY = 'sb_users'
 const CURRENT_USER_KEY = 'sb_current_user'
 
 const emitAuthUpdate = () => {
   window.dispatchEvent(new Event('auth-updated'))
-}
-
-export function getUsers(): User[] {
-  const rawUsers = localStorage.getItem(USERS_KEY)
-
-  if (!rawUsers) {
-    return []
-  }
-
-  try {
-    return JSON.parse(rawUsers) as User[]
-  } catch {
-    return []
-  }
-}
-
-export function saveUsers(users: User[]): void {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users))
 }
 
 export function getCurrentUser(): CurrentUser | null {

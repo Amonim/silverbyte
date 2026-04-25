@@ -13,14 +13,8 @@ export default function ProductSection() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   useEffect(() => {
-    if (product) {
-      const viewed = JSON.parse(localStorage.getItem('viewedProducts') || '[]');
-      if (!viewed.includes(product.id)) {
-        viewed.push(product.id);
-        localStorage.setItem('viewedProducts', JSON.stringify(viewed));
-      }
-    }
-  }, [product]);
+    setActiveImage(0);
+  }, [id]);
 
   if (!product) {
     return (

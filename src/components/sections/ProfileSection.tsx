@@ -22,7 +22,6 @@ function ProfileSection() {
         if (apiOrders && apiOrders.length > 0) {
           setOrders(apiOrders);
           const newStats = calculateProfileStats(apiOrders);
-          // Override points with backend XP
           if (newStats) {
             newStats.points = backendXP;
           }

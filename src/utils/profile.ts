@@ -16,9 +16,9 @@ export const LEVEL_INFO: Record<number, { prefix: string, discount: number }> = 
 export function calculateProfileStats(orders: Order[]): ProfileStats {
   const favoritesCount = getFavorites().length;
   const cartCount = getCartCount();
-  const catalogOpened = localStorage.getItem('catalogOpened') === 'true';
-  const dailyVisit = localStorage.getItem('dailyVisit') !== null;
-  const viewedProducts = JSON.parse(localStorage.getItem('viewedProducts') || '[]').length;
+  const catalogOpened = false;
+  const dailyVisit = false;
+  const viewedProducts = 0;
 
   const orderPoints = orders
     .filter(order => order.status !== 'cancelled')

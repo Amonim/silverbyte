@@ -15,7 +15,6 @@ function CatalogSection() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    localStorage.setItem('catalogOpened', 'true');
     if (queryCategory) {
       setCategory(queryCategory);
       setCurrentPage(1);

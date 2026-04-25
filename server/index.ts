@@ -15,7 +15,6 @@ const USERS_FILE = path.join(DATA_DIR, 'users.json');
 app.use(cors());
 app.use(express.json());
 
-// Initialize storage
 async function initStorage() {
   try {
     await fs.mkdir(DATA_DIR, { recursive: true });
@@ -35,27 +34,22 @@ async function initStorage() {
 }
 initStorage();
 
-// Health check route
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// POST /api/orders - Save new order
 app.post('/api/orders', async (req, res) => {
   try {
     const order = req.body;
     
-    // Calculate XP
     const xp = Math.floor(order.total / 1000);
     order.xp = xp;
 
-    // Save order
     const data = await fs.readFile(ORDERS_FILE, 'utf-8');
     const orders = JSON.parse(data);
     orders.push(order);
     await fs.writeFile(ORDERS_FILE, JSON.stringify(orders, null, 2));
 
-    // Update user XP
     if (order.userEmail) {
       const usersData = await fs.readFile(USERS_FILE, 'utf-8');
       const users = JSON.parse(usersData);
@@ -75,7 +69,6 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
-// GET /api/orders/:userEmail - Get orders for a specific user
 app.get('/api/orders/:userEmail', async (req, res) => {
   try {
     const { userEmail } = req.params;
@@ -88,7 +81,6 @@ app.get('/api/orders/:userEmail', async (req, res) => {
   }
 });
 
-// GET /api/users/:email - Get user XP
 app.get('/api/users/:email', async (req, res) => {
   try {
     const { email } = req.params;
@@ -107,7 +99,6 @@ app.get('/api/users/:email', async (req, res) => {
   }
 });
 
-// POST /api/auth/register - Register new user
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -123,7 +114,7 @@ app.post('/api/auth/register', async (req, res) => {
       id: Date.now(),
       name,
       email,
-      password, // In a real app, hash this
+      password,
       xp: 0
     };
 
@@ -137,7 +128,6 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-// POST /api/auth/login - Login user
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
