@@ -4,6 +4,7 @@ import useCart from "../../hooks/useCart";
 import useAuth from "../../hooks/useAuth";
 import useProfile from "../../hooks/useProfile";
 import { saveOrder, createOrderNumber } from "../../utils/orders";
+import { createOrder } from "../../utils/ordersApi";
 import type { OrderCustomerInfo } from "../../types/order";
 
 function CheckoutSection() {
@@ -90,6 +91,11 @@ function CheckoutSection() {
       status: "pending" as const,
     };
 
+    const finalOrder = { ...newOrder, userEmail: user.email };
+
+    // Send to backend and also save locally for immediate UI update/fallback
+    createOrder(finalOrder).catch(err => console.error("Backend order creation failed:", err));
+    
     saveOrder(newOrder, user.email);
     clearCart();
     navigate("/profile");

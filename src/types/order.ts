@@ -19,4 +19,5 @@ export interface Order {
   customerInfo: OrderCustomerInfo;
   paymentMethod: string;
   status: OrderStatus;
+  userEmail?: string;
 }

@@ -3,16 +3,29 @@ import { useState, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import useProfile from "../../hooks/useProfile";
 import { cancelOrder, getOrders } from "../../utils/orders";
+import { getUserOrders } from "../../utils/ordersApi";
+import { calculateProfileStats } from "../../utils/profile";
 
 function ProfileSection() {
   const { user, authenticated, logoutUser } = useAuth();
-  const { orders: initialOrders, stats } = useProfile();
+  const { orders: initialOrders, stats: initialStats } = useProfile();
 
   const [orders, setOrders] = useState(initialOrders);
+  const [stats, setStats] = useState(initialStats);
 
   useEffect(() => {
-    setOrders(initialOrders);
-  }, [initialOrders]);
+    if (user?.email) {
+      getUserOrders(user.email).then(apiOrders => {
+        if (apiOrders && apiOrders.length > 0) {
+          setOrders(apiOrders);
+          setStats(calculateProfileStats(apiOrders));
+        } else {
+          setOrders(initialOrders);
+          setStats(initialStats);
+        }
+      });
+    }
+  }, [user, initialOrders, initialStats]);
 
   const handleCancelClick = (orderId: string) => {
     if (user) {
