@@ -20,4 +20,5 @@ export interface Order {
   paymentMethod: string;
   status: OrderStatus;
   userEmail?: string;
+  xp?: number;
 }

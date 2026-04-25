@@ -23,6 +23,18 @@ export async function createOrder(order: Order) {
   }
 }
 
+export async function getUserXP(email: string): Promise<number> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/${email}`);
+    if (!response.ok) throw new Error("Failed to fetch user XP");
+    const data = await response.json();
+    return data.xp || 0;
+  } catch (error) {
+    console.error("Error fetching user XP:", error);
+    return 0;
+  }
+}
+
 export async function getUserOrders(userEmail: string): Promise<Order[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/orders/${userEmail}`);

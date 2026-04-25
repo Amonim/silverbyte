@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import useProfile from "../../hooks/useProfile";
 import { cancelOrder, getOrders } from "../../utils/orders";
-import { getUserOrders } from "../../utils/ordersApi";
+import { getUserOrders, getUserXP } from "../../utils/ordersApi";
 import { calculateProfileStats } from "../../utils/profile";
 
 function ProfileSection() {
@@ -15,13 +15,22 @@ function ProfileSection() {
 
   useEffect(() => {
     if (user?.email) {
-      getUserOrders(user.email).then(apiOrders => {
+      Promise.all([
+        getUserOrders(user.email),
+        getUserXP(user.email)
+      ]).then(([apiOrders, backendXP]) => {
         if (apiOrders && apiOrders.length > 0) {
           setOrders(apiOrders);
-          setStats(calculateProfileStats(apiOrders));
+          const newStats = calculateProfileStats(apiOrders);
+          // Override points with backend XP
+          if (newStats) {
+            newStats.points = backendXP;
+          }
+          setStats(newStats);
         } else {
           setOrders(initialOrders);
-          setStats(initialStats);
+          const newStats = stats ? { ...stats, points: backendXP } : initialStats;
+          setStats(newStats);
         }
       });
     }
