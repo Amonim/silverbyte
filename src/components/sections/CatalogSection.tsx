@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { products } from "../../data/product";
 import { addToCart } from "../../utils/cart";
@@ -7,11 +7,21 @@ import FavoriteButton from "../product/FavoriteButton";
 const PRODUCTS_PER_PAGE = 9;
 
 function CatalogSection() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get("search")?.trim().toLowerCase() || "";
+  const queryCategory = searchParams.get("category");
 
-  const [category, setCategory] = useState("all");
+  const [category, setCategory] = useState(queryCategory || "all");
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    if (queryCategory) {
+      setCategory(queryCategory);
+      setCurrentPage(1);
+    } else {
+      setCategory("all");
+    }
+  }, [queryCategory]);
   const [imageIndexes, setImageIndexes] = useState<Record<number, number>>({});
 
   const getCurrentImageIndex = (productId: number) => {
@@ -88,6 +98,16 @@ function CatalogSection() {
   const handleCategoryChange = (newCategory: string) => {
     setCategory(newCategory);
     setCurrentPage(1);
+
+    setSearchParams((prevParams) => {
+      const newParams = new URLSearchParams(prevParams);
+      if (newCategory === "all") {
+        newParams.delete("category");
+      } else {
+        newParams.set("category", newCategory);
+      }
+      return newParams;
+    });
   };
 
   return (
