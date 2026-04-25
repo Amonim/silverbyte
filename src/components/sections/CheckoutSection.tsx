@@ -4,8 +4,11 @@ import useCart from "../../hooks/useCart";
 import useAuth from "../../hooks/useAuth";
 import useProfile from "../../hooks/useProfile";
 import { createOrderNumber } from "../../utils/orders";
-import { createOrder } from "../../utils/ordersApi";
+import { createOrder, getUserXP } from "../../utils/ordersApi";
+import { calculateProfileStats } from "../../utils/profile";
 import type { OrderCustomerInfo } from "../../types/order";
+import type { ProfileStats } from "../../types/profile";
+import { useEffect } from "react";
 
 function CheckoutSection() {
   const { items, total, clearCart } = useCart();
@@ -14,8 +17,18 @@ function CheckoutSection() {
   const navigate = useNavigate();
   const [successOrder, setSuccessOrder] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [backendStats, setBackendStats] = useState<ProfileStats | null>(null);
 
-  const discountPercent = stats?.discount || 0;
+  useEffect(() => {
+    if (user?.email) {
+      getUserXP(user.email).then(xp => {
+        const stats = calculateProfileStats([], xp);
+        setBackendStats(stats);
+      });
+    }
+  }, [user]);
+
+  const discountPercent = backendStats?.discount || 0;
   const discountAmount = Math.round((total * discountPercent) / 100);
   const finalTotal = total - discountAmount;
 
@@ -85,10 +98,14 @@ function CheckoutSection() {
       orderNumber: newOrderNumber,
       date: new Date().toISOString(),
       items: [...items],
+      subtotal: total,
+      discountPercent,
+      discountAmount,
       total: finalTotal,
       customerInfo: formData,
       paymentMethod: "Оплата при получении",
       status: "pending" as const,
+      userPrefix: backendStats?.prefix || "Новичок",
     };
 
     const finalOrder = { ...newOrder, userEmail: user.email };
@@ -271,21 +288,21 @@ function CheckoutSection() {
               ))}
             </div>
 
+            <div className="checkout__summary-row">
+              <span>Сумма</span>
+              <span>{total.toLocaleString()} ₸</span>
+            </div>
+
+            {discountAmount > 0 && (
+              <div className="checkout__summary-row" style={{ color: 'var(--primary)' }}>
+                <span>Скидка {discountPercent}% ({backendStats?.prefix})</span>
+                <span>-{discountAmount.toLocaleString()} ₸</span>
+              </div>
+            )}
+
             <div className="checkout__summary-row checkout__summary-row--total">
               <span>Итого</span>
-              <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                {discountAmount > 0 && (
-                  <span style={{ fontSize: '14px', color: 'var(--primary)', marginBottom: '4px', fontWeight: 'normal' }}>
-                    Скидка: {discountPercent}% ({stats?.prefix})
-                  </span>
-                )}
-                <span>{finalTotal.toLocaleString()} ₸</span>
-                {discountAmount > 0 && (
-                  <span style={{ fontSize: '12px', color: 'var(--text-light)', textDecoration: 'line-through', marginTop: '2px', fontWeight: 'normal' }}>
-                    {total.toLocaleString()} ₸
-                  </span>
-                )}
-              </div>
+              <span>{finalTotal.toLocaleString()} ₸</span>
             </div>
           </aside>
         </div>

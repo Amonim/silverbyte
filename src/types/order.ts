@@ -16,9 +16,13 @@ export interface Order {
   date: string;
   items: CartItem[];
   total: number;
+  subtotal?: number;
+  discountPercent?: number;
+  discountAmount?: number;
   customerInfo: OrderCustomerInfo;
   paymentMethod: string;
   status: OrderStatus;
   userEmail?: string;
+  userPrefix?: string;
   xp?: number;
 }

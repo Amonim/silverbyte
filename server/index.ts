@@ -104,8 +104,8 @@ app.patch('/api/orders/:orderId/cancel', async (req, res) => {
     const { orderId } = req.params;
     const { userEmail } = req.body;
 
-    const data = await fs.readFile(ORDERS_FILE, 'utf-8');
-    const orders = JSON.parse(data);
+    const ordersData = await fs.readFile(ORDERS_FILE, 'utf-8');
+    const orders = JSON.parse(ordersData);
     
     const orderIndex = orders.findIndex((o: any) => o.id === orderId && o.userEmail === userEmail);
     
@@ -113,10 +113,31 @@ app.patch('/api/orders/:orderId/cancel', async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     }
 
-    orders[orderIndex].status = 'cancelled';
+    const order = orders[orderIndex];
+
+    // If already cancelled, just return it
+    if (order.status === 'cancelled') {
+      return res.json(order);
+    }
+
+    // Mark as cancelled
+    order.status = 'cancelled';
     await fs.writeFile(ORDERS_FILE, JSON.stringify(orders, null, 2));
 
-    res.json(orders[orderIndex]);
+    // Subtract XP from user
+    if (userEmail) {
+      const usersData = await fs.readFile(USERS_FILE, 'utf-8');
+      const users = JSON.parse(usersData);
+      const userIndex = users.findIndex((u: any) => u.email === userEmail);
+
+      if (userIndex !== -1) {
+        const orderXP = order.xp || Math.floor(order.total / 1000);
+        users[userIndex].xp = Math.max(0, (users[userIndex].xp || 0) - orderXP);
+        await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
+      }
+    }
+
+    res.json(order);
   } catch (error) {
     res.status(500).json({ error: 'Failed to cancel order' });
   }
