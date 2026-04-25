@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 
 function Footer() {
+  const { authenticated } = useAuth();
+
   return (
     <footer className="footer">
       <div className="container">
@@ -20,28 +23,34 @@ function Footer() {
             <Link to="/catalog" className="footer__link">
               Каталог
             </Link>
-            <a href="#" className="footer__link">
+            <Link to="/cart" className="footer__link">
               Корзина
-            </a>
-            <a href="#" className="footer__link">
-              Войти
-            </a>
+            </Link>
+            {authenticated ? (
+              <Link to="/profile" className="footer__link">
+                Профиль
+              </Link>
+            ) : (
+              <Link to="/login" className="footer__link">
+                Войти
+              </Link>
+            )}
           </div>
 
           <div className="footer__column">
             <h4 className="footer__title">Категории</h4>
-            <a href="#" className="footer__link">
+            <Link to="/catalog?category=smartphones" className="footer__link">
               Смартфоны
-            </a>
-            <a href="#" className="footer__link">
+            </Link>
+            <Link to="/catalog?category=laptops" className="footer__link">
               Ноутбуки
-            </a>
-            <a href="#" className="footer__link">
+            </Link>
+            <Link to="/catalog?category=computers" className="footer__link">
               Компьютеры
-            </a>
-            <a href="#" className="footer__link">
+            </Link>
+            <Link to="/catalog?category=periphery" className="footer__link">
               Аксессуары
-            </a>
+            </Link>
           </div>
 
           <div className="footer__column">
