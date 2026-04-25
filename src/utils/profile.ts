@@ -2,7 +2,15 @@ import type { Order } from "../types/order";
 import type { ProfileStats, Achievement } from "../types/profile";
 import { getFavorites } from "./favorites";
 
-const LEVELS = [0, 300, 700, 1500];
+const LEVELS = [0, 300, 700, 1500, 3000];
+
+export const LEVEL_INFO: Record<number, { prefix: string, discount: number }> = {
+  1: { prefix: "Новичок", discount: 0 },
+  2: { prefix: "Покупатель", discount: 2 },
+  3: { prefix: "Активный", discount: 3 },
+  4: { prefix: "Коллекционер", discount: 5 },
+  5: { prefix: "VIP", discount: 7 }
+};
 
 export function calculateProfileStats(orders: Order[]): ProfileStats {
   let points = 100;
@@ -22,6 +30,8 @@ export function calculateProfileStats(orders: Order[]): ProfileStats {
       nextLevelPoints = LEVELS[i + 1] || LEVELS[LEVELS.length - 1];
     }
   }
+  
+  if (level > 5) level = 5;
 
   let progressToNext = 100;
   if (level < LEVELS.length) {
@@ -69,11 +79,16 @@ export function calculateProfileStats(orders: Order[]): ProfileStats {
     }
   ];
 
+  const prefix = LEVEL_INFO[level]?.prefix || "Новичок";
+  const discount = LEVEL_INFO[level]?.discount || 0;
+
   return {
     points,
     level,
     progressToNext,
     nextLevelPoints,
-    achievements
+    achievements,
+    prefix,
+    discount
   };
 }

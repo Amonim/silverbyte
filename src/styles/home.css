@@ -6,6 +6,12 @@
   background-size: cover;
   background-position: center;
   position: relative;
+  background-image: url("/images/hero.png");
+  transition: background-image 0.3s ease-in-out;
+}
+
+[data-theme="light"] .hero {
+  background-image: url("/images/hero2.png");
 }
 
 .hero::before {

@@ -2,15 +2,22 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useCart from "../../hooks/useCart";
 import useAuth from "../../hooks/useAuth";
+import useProfile from "../../hooks/useProfile";
 import { saveOrder, createOrderNumber } from "../../utils/orders";
 import type { OrderCustomerInfo } from "../../types/order";
 
 function CheckoutSection() {
   const { items, total, clearCart } = useCart();
   const { user, authenticated } = useAuth();
+  const { stats } = useProfile();
   const navigate = useNavigate();
   const [successOrder, setSuccessOrder] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const discountPercent = stats?.discount || 0;
+  const discountAmount = Math.round((total * discountPercent) / 100);
+  const finalTotal = total - discountAmount;
+
 
   const [formData, setFormData] = useState<OrderCustomerInfo>({
     fullName: "",
@@ -77,7 +84,7 @@ function CheckoutSection() {
       orderNumber: newOrderNumber,
       date: new Date().toISOString(),
       items: [...items],
-      total,
+      total: finalTotal,
       customerInfo: formData,
       paymentMethod: "Оплата при получении",
       status: "pending" as const,
@@ -254,7 +261,19 @@ function CheckoutSection() {
 
             <div className="checkout__summary-row checkout__summary-row--total">
               <span>Итого</span>
-              <span>{total.toLocaleString()} ₸</span>
+              <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                {discountAmount > 0 && (
+                  <span style={{ fontSize: '14px', color: 'var(--primary)', marginBottom: '4px', fontWeight: 'normal' }}>
+                    Скидка: {discountPercent}% ({stats?.prefix})
+                  </span>
+                )}
+                <span>{finalTotal.toLocaleString()} ₸</span>
+                {discountAmount > 0 && (
+                  <span style={{ fontSize: '12px', color: 'var(--text-light)', textDecoration: 'line-through', marginTop: '2px', fontWeight: 'normal' }}>
+                    {total.toLocaleString()} ₸
+                  </span>
+                )}
+              </div>
             </div>
           </aside>
         </div>

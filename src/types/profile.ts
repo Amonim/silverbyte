@@ -13,4 +13,6 @@ export interface ProfileStats {
   progressToNext: number;
   nextLevelPoints: number;
   achievements: Achievement[];
+  prefix: string;
+  discount: number;
 }

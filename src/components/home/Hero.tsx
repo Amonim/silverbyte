@@ -1,40 +1,8 @@
-import { useState, useEffect } from "react";
-import heroBgDark from "/images/hero.png";
-import heroBgLight from "/images/hero2.png";
 import { Link } from "react-router-dom";
 
 function Hero() {
-  const [theme, setTheme] = useState(() => 
-    document.documentElement.getAttribute("data-theme") || "dark"
-  );
-
-  useEffect(() => {
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === "data-theme") {
-          setTheme(document.documentElement.getAttribute("data-theme") || "dark");
-        }
-      });
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  const heroBg = theme === "light" ? heroBgLight : heroBgDark;
-
   return (
-    <section 
-      className="hero" 
-      style={{ 
-        backgroundImage: `url(${heroBg})`,
-        transition: "background-image 0.3s ease-in-out"
-      }}
-    >
+    <section className="hero">
       <div className="container">
         <div className="hero__content">
           <h1 className="hero__title">

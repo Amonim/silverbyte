@@ -57,6 +57,11 @@ function ProfileSection() {
               </div>
               <div className="profile__details">
                 <h2 className="profile__name">{user.name}</h2>
+                {stats && (
+                  <span className="profile__prefix" style={{ color: 'var(--primary)', fontSize: '14px', fontWeight: '500', display: 'inline-block', marginBottom: '4px' }}>
+                    {stats.prefix}
+                  </span>
+                )}
                 <p className="profile__email">{user.email}</p>
               </div>
               <button className="profile__logout" onClick={logoutUser}>
@@ -79,7 +84,7 @@ function ProfileSection() {
                     style={{ width: `${stats.progressToNext}%` }}
                   ></div>
                 </div>
-                {stats.level < 4 && (
+                {stats.level < 5 && (
                   <div className="profile__progress-text">
                     До {stats.level + 1} уровня: {stats.nextLevelPoints - stats.points} баллов
                   </div>
