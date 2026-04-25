@@ -13,7 +13,7 @@ function RegisterSection() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setError("");
@@ -29,7 +29,7 @@ function RegisterSection() {
       return;
     }
 
-    const result = registerUser(name, email, password);
+    const result = await registerUser(name, email, password);
 
     if (!result.success) {
       setError(result.message);

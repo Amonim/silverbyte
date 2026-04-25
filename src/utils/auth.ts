@@ -53,74 +53,86 @@ export function isAuthenticated(): boolean {
   return getCurrentUser() !== null
 }
 
-export function registerUser(
+const API_BASE_URL = 'http://localhost:5000/api'
+
+export async function registerUser(
   name: string,
   email: string,
   password: string
-): { success: boolean; message: string } {
-  const users = getUsers()
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, email, password }),
+    })
 
-  const existingUser = users.find(
-    (user) => user.email.toLowerCase() === email.toLowerCase()
-  )
+    const data = await response.json()
 
-  if (existingUser) {
+    if (!response.ok) {
+      return {
+        success: false,
+        message: data.error || 'Ошибка регистрации',
+      }
+    }
+
+    saveCurrentUser({
+      id: data.id,
+      name: data.name,
+      email: data.email,
+    })
+
+    return {
+      success: true,
+      message: 'Регистрация прошла успешно',
+    }
+  } catch (error) {
     return {
       success: false,
-      message: 'Пользователь с таким email уже существует',
+      message: 'Ошибка соединения с сервером',
     }
-  }
-
-  const newUser: User = {
-    id: Date.now(),
-    name,
-    email,
-    password,
-  }
-
-  users.push(newUser)
-  saveUsers(users)
-
-  saveCurrentUser({
-    id: newUser.id,
-    name: newUser.name,
-    email: newUser.email,
-  })
-
-  return {
-    success: true,
-    message: 'Регистрация прошла успешно',
   }
 }
 
-export function loginUser(
+export async function loginUser(
   email: string,
   password: string
-): { success: boolean; message: string } {
-  const users = getUsers()
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    })
 
-  const foundUser = users.find(
-    (user) =>
-      user.email.toLowerCase() === email.toLowerCase() &&
-      user.password === password
-  )
+    const data = await response.json()
 
-  if (!foundUser) {
+    if (!response.ok) {
+      return {
+        success: false,
+        message: data.error || 'Неверный email или пароль',
+      }
+    }
+
+    saveCurrentUser({
+      id: data.id,
+      name: data.name,
+      email: data.email,
+    })
+
+    return {
+      success: true,
+      message: 'Вход выполнен успешно',
+    }
+  } catch (error) {
     return {
       success: false,
-      message: 'Неверный email или пароль',
+      message: 'Ошибка соединения с сервером',
     }
-  }
-
-  saveCurrentUser({
-    id: foundUser.id,
-    name: foundUser.name,
-    email: foundUser.email,
-  })
-
-  return {
-    success: true,
-    message: 'Вход выполнен успешно',
   }
 }
 

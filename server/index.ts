@@ -97,12 +97,62 @@ app.get('/api/users/:email', async (req, res) => {
     const user = users.find((u: any) => u.email === email);
     
     if (user) {
-      res.json(user);
+      const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
     } else {
       res.json({ email, xp: 0 });
     }
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch user' });
+  }
+});
+
+// POST /api/auth/register - Register new user
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    const data = await fs.readFile(USERS_FILE, 'utf-8');
+    const users = JSON.parse(data);
+    
+    const existingUser = users.find((u: any) => u.email === email);
+    if (existingUser) {
+      return res.status(400).json({ error: 'Пользователь с таким email уже существует' });
+    }
+
+    const newUser = {
+      id: Date.now(),
+      name,
+      email,
+      password, // In a real app, hash this
+      xp: 0
+    };
+
+    users.push(newUser);
+    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
+
+    const { password: _, ...userWithoutPassword } = newUser;
+    res.status(201).json(userWithoutPassword);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to register user' });
+  }
+});
+
+// POST /api/auth/login - Login user
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const data = await fs.readFile(USERS_FILE, 'utf-8');
+    const users = JSON.parse(data);
+    
+    const user = users.find((u: any) => u.email === email && u.password === password);
+    if (!user) {
+      return res.status(401).json({ error: 'Неверный email или пароль' });
+    }
+
+    const { password: _, ...userWithoutPassword } = user;
+    res.json(userWithoutPassword);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to login' });
   }
 });
 

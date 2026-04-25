@@ -11,7 +11,7 @@ function LoginSection() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setError("");
@@ -22,7 +22,7 @@ function LoginSection() {
       return;
     }
 
-    const result = loginUser(email, password);
+    const result = await loginUser(email, password);
 
     if (!result.success) {
       setError(result.message);

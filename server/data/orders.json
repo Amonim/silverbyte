@@ -1,8 +1,8 @@
 [
   {
-    "id": "afc043b1-5b23-4191-b7c1-ce74a884fffe",
-    "orderNumber": "ORD-339942",
-    "date": "2026-04-25T08:22:00.455Z",
+    "id": "45122639-61e5-459a-b333-ac02b31442a1",
+    "orderNumber": "ORD-941183",
+    "date": "2026-04-25T08:52:09.623Z",
     "items": [
       {
         "id": 1,
@@ -16,51 +16,19 @@
         "title": "Samsung Galaxy S24",
         "price": 529990,
         "image": "/images/Samsung_Galaxy_S24_1.png",
-        "quantity": 2
-      }
-    ],
-    "total": 1590272,
-    "customerInfo": {
-      "fullName": "Ондарбекавич Абиев Арын",
-      "phone": "+77761488104",
-      "city": "Павлодар",
-      "address": "Камзина 20",
-      "comment": "а"
-    },
-    "paymentMethod": "Оплата при получении",
-    "status": "pending",
-    "userEmail": "aryn.abiev15@mail.ru"
-  },
-  {
-    "id": "12108816-562b-426d-a884-f42d391b0794",
-    "orderNumber": "ORD-625219",
-    "date": "2026-04-25T08:36:37.821Z",
-    "items": [
-      {
-        "id": 1,
-        "title": "iPhone 15 Pro",
-        "price": 649990,
-        "image": "/images/iphone_15_pro_1.png",
-        "quantity": 1
-      },
-      {
-        "id": 2,
-        "title": "Samsung Galaxy S24",
-        "price": 529990,
-        "image": "/images/Samsung_Galaxy_S24_1.png",
-        "quantity": 1
+        "quantity": 4
       },
       {
         "id": 3,
         "title": "Xiaomi 14",
         "price": 389990,
         "image": "/images/Xiaomi_14_1.png",
-        "quantity": 1
+        "quantity": 4
       }
     ],
-    "total": 1460072,
+    "total": 4026816,
     "customerInfo": {
-      "fullName": "Арын Ондарбекавич Абиев",
+      "fullName": "Абиев Арын Ондарбекавич",
       "phone": "+77761488104",
       "city": "Павлодар",
       "address": "Камзина 20",
@@ -68,7 +36,7 @@
     },
     "paymentMethod": "Оплата при получении",
     "status": "pending",
-    "userEmail": "aryn.abiev15@mail.ru",
-    "xp": 1460
+    "userEmail": "aryn.abiev@mail.ru",
+    "xp": 4026
   }
 ]

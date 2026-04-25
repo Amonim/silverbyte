@@ -1,6 +1,9 @@
 [
   {
-    "email": "aryn.abiev15@mail.ru",
-    "xp": 1460
+    "id": 1777107045768,
+    "name": "Арын",
+    "email": "aryn.abiev@mail.ru",
+    "password": "qwerty",
+    "xp": 4026
   }
 ]
