@@ -56,12 +56,27 @@ function ProfileSection() {
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <div className="profile__details">
-                <h2 className="profile__name">{user.name}</h2>
                 {stats && (
-                  <span className="profile__prefix" style={{ color: 'var(--primary)', fontSize: '14px', fontWeight: '500', display: 'inline-block', marginBottom: '4px' }}>
-                    {stats.prefix}
-                  </span>
+                  <div style={{ marginBottom: '4px' }}>
+                    <span className="profile__prefix" style={{ 
+                      fontSize: '12px', 
+                      fontWeight: 'bold', 
+                      display: 'inline-block', 
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      color: '#fff',
+                      background: 
+                        stats.level === 1 ? '#808080' : 
+                        stats.level === 2 ? '#3b82f6' : 
+                        stats.level === 3 ? 'linear-gradient(135deg, #a855f7, #6366f1)' : 
+                        stats.level === 4 ? '#eab308' : 
+                        'linear-gradient(135deg, #ef4444, #b91c1c)'
+                    }}>
+                      {stats.prefix}
+                    </span>
+                  </div>
                 )}
+                <h2 className="profile__name">{user.name}</h2>
                 <p className="profile__email">{user.email}</p>
               </div>
               <button className="profile__logout" onClick={logoutUser}>
@@ -94,8 +109,15 @@ function ProfileSection() {
                   {stats.achievements.map((ach) => (
                     <div key={ach.id} className={`profile__achievement ${ach.completed ? 'profile__achievement--completed' : ''}`}>
                       <div className="profile__ach-header">
-                        <span className="profile__ach-title">{ach.title}</span>
-                        <span className="profile__ach-progress">{ach.progress} / {ach.total}</span>
+                        <span className="profile__ach-title">
+                          {ach.title}
+                          {ach.reward > 0 && (
+                            <span style={{fontSize: '12px', color: 'var(--primary)', marginLeft: '8px', fontWeight: 'bold'}}>+{ach.reward} XP</span>
+                          )}
+                        </span>
+                        <span className="profile__ach-progress">
+                          {ach.total > 0 ? `${ach.progress} / ${ach.total}` : `Накоплено: ${ach.progress} XP`}
+                        </span>
                       </div>
                       <p className="profile__ach-desc">{ach.description}</p>
                     </div>

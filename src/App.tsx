@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./components/pages/HomePage";
 import Catalog from "./components/pages/CatalogPage";
@@ -11,6 +12,10 @@ import CheckoutPage from "./components/pages/CheckoutPage";
 import ProfilePage from "./components/pages/ProfilePage";
 
 function App() {
+  useEffect(() => {
+    localStorage.setItem('dailyVisit', new Date().toISOString().split('T')[0]);
+  }, []);
+
   return (
     <BrowserRouter>
       <ScrollToTop />

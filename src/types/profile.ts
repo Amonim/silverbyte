@@ -5,6 +5,7 @@ export interface Achievement {
   completed: boolean;
   progress: number;
   total: number;
+  reward: number;
 }
 
 export interface ProfileStats {

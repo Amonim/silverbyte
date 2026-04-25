@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { products } from "../../data/product";
 import RelatedProduct from "../product/RelatedProduct";
@@ -11,6 +11,16 @@ export default function ProductSection() {
 
   const [activeImage, setActiveImage] = useState(0);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  useEffect(() => {
+    if (product) {
+      const viewed = JSON.parse(localStorage.getItem('viewedProducts') || '[]');
+      if (!viewed.includes(product.id)) {
+        viewed.push(product.id);
+        localStorage.setItem('viewedProducts', JSON.stringify(viewed));
+      }
+    }
+  }, [product]);
 
   if (!product) {
     return (
