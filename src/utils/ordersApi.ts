@@ -49,3 +49,24 @@ export async function getUserOrders(userEmail: string): Promise<Order[]> {
     return []; // Return empty array as safe fallback
   }
 }
+
+export async function cancelOrder(orderId: string, userEmail: string): Promise<Order | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/orders/${orderId}/cancel`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userEmail }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to cancel order");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error cancelling order:", error);
+    return null;
+  }
+}

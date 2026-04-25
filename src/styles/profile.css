@@ -279,3 +279,18 @@
   color: var(--color-subtext);
   font-size: 15px;
 }
+
+.profile__prefix {
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  color: #fff;
+}
+
+.profile__prefix--level-1 { background: #808080; }
+.profile__prefix--level-2 { background: #3b82f6; }
+.profile__prefix--level-3 { background: linear-gradient(135deg, #a855f7, #6366f1); }
+.profile__prefix--level-4 { background: #eab308; }
+.profile__prefix--level-5 { background: linear-gradient(135deg, #ef4444, #b91c1c); }

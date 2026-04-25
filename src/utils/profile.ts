@@ -13,7 +13,7 @@ export const LEVEL_INFO: Record<number, { prefix: string, discount: number }> = 
   5: { prefix: "VIP", discount: 7 }
 };
 
-export function calculateProfileStats(orders: Order[]): ProfileStats {
+export function calculateProfileStats(orders: Order[], backendXP?: number): ProfileStats {
   const favoritesCount = getFavorites().length;
   const cartCount = getCartCount();
   const catalogOpened = false;
@@ -117,10 +117,15 @@ export function calculateProfileStats(orders: Order[]): ProfileStats {
     }
   ];
 
-  let points = 100 + orderPoints;
-  achievements.forEach(ach => {
-    if (ach.completed) points += ach.reward;
-  });
+  // If backendXP is provided, it's our absolute source of truth
+  let points = typeof backendXP === 'number' ? backendXP : 100 + orderPoints;
+  
+  // If not using backendXP, we calculate points from achievements
+  if (typeof backendXP !== 'number') {
+    achievements.forEach(ach => {
+      if (ach.completed) points += ach.reward;
+    });
+  }
 
   let level = 1;
   let nextLevelPoints = LEVELS[1];
@@ -135,12 +140,16 @@ export function calculateProfileStats(orders: Order[]): ProfileStats {
   if (level > 5) level = 5;
 
   let progressToNext = 100;
-  if (level < LEVELS.length) {
+  // If level is 5, we are at max level, progress is 100%, and we don't have a "nextLevelPoints" that is higher than current points
+  if (level < 5) {
     const currentLevelPoints = LEVELS[level - 1];
     progressToNext = Math.min(
       100,
       Math.max(0, ((points - currentLevelPoints) / (nextLevelPoints - currentLevelPoints)) * 100)
     );
+  } else {
+    progressToNext = 100;
+    nextLevelPoints = points; // Avoid negative values in UI if points > 3000
   }
 
   const prefix = LEVEL_INFO[level]?.prefix || "Новичок";

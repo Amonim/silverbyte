@@ -2,43 +2,44 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import useProfile from "../../hooks/useProfile";
-import { cancelOrder, getOrders } from "../../utils/orders";
-import { getUserOrders, getUserXP } from "../../utils/ordersApi";
+import { getUserOrders, getUserXP, cancelOrder } from "../../utils/ordersApi";
 import { calculateProfileStats } from "../../utils/profile";
+
+import type { Order } from "../../types/order";
+import type { ProfileStats } from "../../types/profile";
 
 function ProfileSection() {
   const { user, authenticated, logoutUser } = useAuth();
-  const { orders: initialOrders, stats: initialStats } = useProfile();
+  const { orders: _initialOrders, stats: _initialStats } = useProfile();
 
-  const [orders, setOrders] = useState(initialOrders);
-  const [stats, setStats] = useState(initialStats);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [stats, setStats] = useState<ProfileStats | null>(null);
+
+  const loadProfileData = async () => {
+    if (user?.email) {
+      try {
+        const [apiOrders, backendXP] = await Promise.all([
+          getUserOrders(user.email),
+          getUserXP(user.email)
+        ]);
+        
+        setOrders(apiOrders);
+        const newStats = calculateProfileStats(apiOrders, backendXP);
+        setStats(newStats);
+      } catch (err) {
+        console.error("Failed to load profile data:", err);
+      }
+    }
+  };
 
   useEffect(() => {
-    if (user?.email) {
-      Promise.all([
-        getUserOrders(user.email),
-        getUserXP(user.email)
-      ]).then(([apiOrders, backendXP]) => {
-        if (apiOrders && apiOrders.length > 0) {
-          setOrders(apiOrders);
-          const newStats = calculateProfileStats(apiOrders);
-          if (newStats) {
-            newStats.points = backendXP;
-          }
-          setStats(newStats);
-        } else {
-          setOrders(initialOrders);
-          const newStats = stats ? { ...stats, points: backendXP } : initialStats;
-          setStats(newStats);
-        }
-      });
-    }
-  }, [user, initialOrders, initialStats]);
+    loadProfileData();
+  }, [user]);
 
-  const handleCancelClick = (orderId: string) => {
+  const handleCancelClick = async (orderId: string) => {
     if (user) {
-      cancelOrder(orderId, user.email);
-      setOrders(getOrders(user.email));
+      await cancelOrder(orderId, user.email);
+      loadProfileData();
     }
   };
 
@@ -79,20 +80,7 @@ function ProfileSection() {
               <div className="profile__details">
                 {stats && (
                   <div style={{ marginBottom: '4px' }}>
-                    <span className="profile__prefix" style={{ 
-                      fontSize: '12px', 
-                      fontWeight: 'bold', 
-                      display: 'inline-block', 
-                      padding: '2px 8px',
-                      borderRadius: '12px',
-                      color: '#fff',
-                      background: 
-                        stats.level === 1 ? '#808080' : 
-                        stats.level === 2 ? '#3b82f6' : 
-                        stats.level === 3 ? 'linear-gradient(135deg, #a855f7, #6366f1)' : 
-                        stats.level === 4 ? '#eab308' : 
-                        'linear-gradient(135deg, #ef4444, #b91c1c)'
-                    }}>
+                    <span className={`profile__prefix profile__prefix--level-${stats.level}`}>
                       {stats.prefix}
                     </span>
                   </div>
@@ -120,9 +108,13 @@ function ProfileSection() {
                     style={{ width: `${stats.progressToNext}%` }}
                   ></div>
                 </div>
-                {stats.level < 5 && (
+                {stats.level < 5 ? (
                   <div className="profile__progress-text">
                     До {stats.level + 1} уровня: {stats.nextLevelPoints - stats.points} баллов
+                  </div>
+                ) : (
+                  <div className="profile__progress-text">
+                    Максимальный уровень
                   </div>
                 )}
 

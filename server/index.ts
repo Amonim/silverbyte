@@ -99,6 +99,29 @@ app.get('/api/users/:email', async (req, res) => {
   }
 });
 
+app.patch('/api/orders/:orderId/cancel', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { userEmail } = req.body;
+
+    const data = await fs.readFile(ORDERS_FILE, 'utf-8');
+    const orders = JSON.parse(data);
+    
+    const orderIndex = orders.findIndex((o: any) => o.id === orderId && o.userEmail === userEmail);
+    
+    if (orderIndex === -1) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    orders[orderIndex].status = 'cancelled';
+    await fs.writeFile(ORDERS_FILE, JSON.stringify(orders, null, 2));
+
+    res.json(orders[orderIndex]);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to cancel order' });
+  }
+});
+
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
