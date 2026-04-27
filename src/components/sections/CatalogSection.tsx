@@ -13,6 +13,7 @@ function CatalogSection() {
 
   const [category, setCategory] = useState(queryCategory || "all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState("default");
 
   useEffect(() => {
     if (queryCategory) {
@@ -87,13 +88,29 @@ function CatalogSection() {
     return result;
   }, [category, searchQuery]);
 
-  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+  const sortedProducts = useMemo(() => {
+    const result = [...filteredProducts];
+    switch (sortBy) {
+      case "price-asc":
+        return result.sort((a, b) => a.price - b.price);
+      case "price-desc":
+        return result.sort((a, b) => b.price - a.price);
+      case "name-asc":
+        return result.sort((a, b) => a.title.localeCompare(b.title));
+      case "name-desc":
+        return result.sort((a, b) => b.title.localeCompare(a.title));
+      default:
+        return result;
+    }
+  }, [filteredProducts, sortBy]);
+
+  const totalPages = Math.ceil(sortedProducts.length / PRODUCTS_PER_PAGE);
 
   const paginatedProducts = useMemo(() => {
     const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
     const endIndex = startIndex + PRODUCTS_PER_PAGE;
-    return filteredProducts.slice(startIndex, endIndex);
-  }, [filteredProducts, currentPage]);
+    return sortedProducts.slice(startIndex, endIndex);
+  }, [sortedProducts, currentPage]);
 
   const handleCategoryChange = (newCategory: string) => {
     setCategory(newCategory);
@@ -182,7 +199,28 @@ function CatalogSection() {
           </aside>
 
           <div className="catalog__content">
-            {filteredProducts.length === 0 ? (
+            <div className="catalog__actions">
+              <div className="catalog__count">
+                Найдено товаров: <span>{sortedProducts.length}</span>
+              </div>
+              <div className="catalog__sort">
+                <label htmlFor="sort-select">Сортировка:</label>
+                <select
+                  id="sort-select"
+                  className="catalog__sort-select"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="default">По умолчанию</option>
+                  <option value="price-asc">Дешевле</option>
+                  <option value="price-desc">Дороже</option>
+                  <option value="name-asc">По названию (А-Я)</option>
+                  <option value="name-desc">По названию (Я-А)</option>
+                </select>
+              </div>
+            </div>
+
+            {sortedProducts.length === 0 ? (
               <div className="catalog__empty">
                 <h2 className="catalog__empty-title">Ничего не найдено</h2>
                 <p className="catalog__empty-text">
@@ -204,7 +242,7 @@ function CatalogSection() {
                           <img
                             src={
                               product.images[
-                                getCurrentImageIndex(product.id)
+                              getCurrentImageIndex(product.id)
                               ]
                             }
                             alt={product.title}
@@ -249,7 +287,7 @@ function CatalogSection() {
                                     key={index}
                                     className={
                                       index ===
-                                      getCurrentImageIndex(product.id)
+                                        getCurrentImageIndex(product.id)
                                         ? "catalog-card__dot catalog-card__dot--active"
                                         : "catalog-card__dot"
                                     }
