@@ -1,1 +1,120 @@
-[]
+[
+  {
+    "id": "7cbe458b-1200-4907-8626-48f2544481ae",
+    "orderNumber": "ORD-269592",
+    "date": "2026-05-03T09:01:38.022Z",
+    "items": [
+      {
+        "id": 1,
+        "title": "iPhone 15 Pro",
+        "price": 649990,
+        "image": "/images/iphone_15_pro_1.png",
+        "quantity": 1
+      },
+      {
+        "id": 2,
+        "title": "Samsung Galaxy S24",
+        "price": 529990,
+        "image": "/images/Samsung_Galaxy_S24_1.png",
+        "quantity": 1
+      }
+    ],
+    "subtotal": 1179980,
+    "discountPercent": 0,
+    "discountAmount": 0,
+    "total": 1179980,
+    "customerInfo": {
+      "fullName": "Ондарбекавич Абиев Арын",
+      "phone": "+77761488104",
+      "city": "Павлодар",
+      "address": "Камзина 20",
+      "comment": "домофон не работает"
+    },
+    "paymentMethod": "Оплата при получении",
+    "status": "pending",
+    "userPrefix": "Новичок",
+    "userEmail": "aryn.abiev@mail.ru",
+    "xp": 1179
+  },
+  {
+    "id": "ff69db70-9232-4258-a7ad-c2017468f8f4",
+    "orderNumber": "ORD-647691",
+    "date": "2026-05-03T09:02:06.746Z",
+    "items": [
+      {
+        "id": 1,
+        "title": "iPhone 15 Pro",
+        "price": 649990,
+        "image": "/images/iphone_15_pro_1.png",
+        "quantity": 3
+      },
+      {
+        "id": 2,
+        "title": "Samsung Galaxy S24",
+        "price": 529990,
+        "image": "/images/Samsung_Galaxy_S24_1.png",
+        "quantity": 2
+      }
+    ],
+    "subtotal": 3009950,
+    "discountPercent": 3,
+    "discountAmount": 90299,
+    "total": 2919651,
+    "customerInfo": {
+      "fullName": "Арын Ондарбекавич Абиев",
+      "phone": "+77761488104",
+      "city": "Павлодар",
+      "address": "Камзина 20",
+      "comment": "домофон не работает"
+    },
+    "paymentMethod": "Оплата при получении",
+    "status": "cancelled",
+    "userPrefix": "Активный",
+    "userEmail": "aryn.abiev@mail.ru",
+    "xp": 2919
+  },
+  {
+    "id": "079df149-85e1-4e3c-9677-d16265bd72c1",
+    "orderNumber": "ORD-646353",
+    "date": "2026-05-03T09:02:25.590Z",
+    "items": [
+      {
+        "id": 22,
+        "title": "Монитор UltraView 27",
+        "price": 159990,
+        "image": "/images/UltraView_27_1.png",
+        "quantity": 1
+      },
+      {
+        "id": 23,
+        "title": "Xiaomi Смарт-часы Watch S4 M2425W1",
+        "price": 89990,
+        "image": "/images/Watch_S4_M2425W1_1.png",
+        "quantity": 2
+      },
+      {
+        "id": 24,
+        "title": "колонка hopestar 26 pro",
+        "price": 39990,
+        "image": "/images/hopestar_26_pro_1.png",
+        "quantity": 1
+      }
+    ],
+    "subtotal": 379960,
+    "discountPercent": 7,
+    "discountAmount": 26597,
+    "total": 353363,
+    "customerInfo": {
+      "fullName": "Абиев Арын Ондарбекавич",
+      "phone": "+77761488104",
+      "city": "Павлодар",
+      "address": "Камзина 20",
+      "comment": "домофон не работает"
+    },
+    "paymentMethod": "Оплата при получении",
+    "status": "pending",
+    "userPrefix": "VIP",
+    "userEmail": "aryn.abiev@mail.ru",
+    "xp": 353
+  }
+]

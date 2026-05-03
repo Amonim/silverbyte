@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "id": 1777798891459,
+    "name": "Пользователь",
+    "email": "aryn.abiev@mail.ru",
+    "password": "qwerty",
+    "xp": 1532
+  }
+]

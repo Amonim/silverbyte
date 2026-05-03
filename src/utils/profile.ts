@@ -117,10 +117,8 @@ export function calculateProfileStats(orders: Order[], backendXP?: number): Prof
     }
   ];
 
-  // If backendXP is provided, it's our absolute source of truth
   let points = typeof backendXP === 'number' ? backendXP : 100 + orderPoints;
-  
-  // If not using backendXP, we calculate points from achievements
+
   if (typeof backendXP !== 'number') {
     achievements.forEach(ach => {
       if (ach.completed) points += ach.reward;
@@ -136,11 +134,11 @@ export function calculateProfileStats(orders: Order[], backendXP?: number): Prof
       nextLevelPoints = LEVELS[i + 1] || LEVELS[LEVELS.length - 1];
     }
   }
-  
+
   if (level > 5) level = 5;
 
   let progressToNext = 100;
-  // If level is 5, we are at max level, progress is 100%, and we don't have a "nextLevelPoints" that is higher than current points
+
   if (level < 5) {
     const currentLevelPoints = LEVELS[level - 1];
     progressToNext = Math.min(
@@ -149,7 +147,7 @@ export function calculateProfileStats(orders: Order[], backendXP?: number): Prof
     );
   } else {
     progressToNext = 100;
-    nextLevelPoints = points; // Avoid negative values in UI if points > 3000
+    nextLevelPoints = points;
   }
 
   const prefix = LEVEL_INFO[level]?.prefix || "Новичок";
