@@ -4,6 +4,7 @@ import { products } from "../../data/product";
 import RelatedProduct from "../product/RelatedProduct";
 import { addToCart } from "../../utils/cart";
 import FavoriteButton from "../product/FavoriteButton";
+import { markProductViewed } from "../../utils/profile";
 
 export default function ProductSection() {
   const { id } = useParams();
@@ -14,7 +15,10 @@ export default function ProductSection() {
 
   useEffect(() => {
     setActiveImage(0);
-  }, [id]);
+    if (product) {
+      markProductViewed(product.id);
+    }
+  }, [id, product]);
 
   if (!product) {
     return (

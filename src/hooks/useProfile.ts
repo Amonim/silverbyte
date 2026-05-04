@@ -27,11 +27,13 @@ export default function useProfile() {
     window.addEventListener("orders-updated", updateProfileData);
     window.addEventListener("favorites-updated", updateProfileData);
     window.addEventListener("storage", updateProfileData);
+    window.addEventListener("profile-updated", updateProfileData);
 
     return () => {
       window.removeEventListener("orders-updated", updateProfileData);
       window.removeEventListener("favorites-updated", updateProfileData);
       window.removeEventListener("storage", updateProfileData);
+      window.removeEventListener("profile-updated", updateProfileData);
     };
   }, [authenticated, user]);
 

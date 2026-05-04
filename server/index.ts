@@ -115,16 +115,13 @@ app.patch('/api/orders/:orderId/cancel', async (req, res) => {
 
     const order = orders[orderIndex];
 
-    // If already cancelled, just return it
     if (order.status === 'cancelled') {
       return res.json(order);
     }
 
-    // Mark as cancelled
     order.status = 'cancelled';
     await fs.writeFile(ORDERS_FILE, JSON.stringify(orders, null, 2));
 
-    // Subtract XP from user
     if (userEmail) {
       const usersData = await fs.readFile(USERS_FILE, 'utf-8');
       const users = JSON.parse(usersData);

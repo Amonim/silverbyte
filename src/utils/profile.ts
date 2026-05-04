@@ -2,8 +2,47 @@ import type { Order } from "../types/order";
 import type { ProfileStats, Achievement } from "../types/profile";
 import { getFavorites } from "./favorites";
 import { getCartCount } from "./cart";
+import { getCurrentUser } from "./auth";
 
 const LEVELS = [0, 300, 700, 1500, 3000];
+
+const getTrackingKey = (key: string) => {
+  const user = getCurrentUser();
+  return user ? `sb_tracking_${user.id}_${key}` : `sb_tracking_guest_${key}`;
+};
+
+export const markDailyVisit = () => {
+  const key = getTrackingKey("daily_visit");
+  if (localStorage.getItem(key) !== "true") {
+    localStorage.setItem(key, "true");
+    window.dispatchEvent(new Event("profile-updated"));
+  }
+};
+
+export const markCatalogOpened = () => {
+  const key = getTrackingKey("catalog_opened");
+  if (localStorage.getItem(key) !== "true") {
+    localStorage.setItem(key, "true");
+    window.dispatchEvent(new Event("profile-updated"));
+  }
+};
+
+export const markProductViewed = (productId: number) => {
+  const key = getTrackingKey("viewed_products");
+  try {
+    const viewedStr = localStorage.getItem(key);
+    const viewed: number[] = viewedStr ? JSON.parse(viewedStr) : [];
+    if (!viewed.includes(productId)) {
+      viewed.push(productId);
+      localStorage.setItem(key, JSON.stringify(viewed));
+      window.dispatchEvent(new Event("profile-updated"));
+    }
+  } catch (e) {
+    localStorage.setItem(key, JSON.stringify([productId]));
+    window.dispatchEvent(new Event("profile-updated"));
+  }
+};
+
 
 export const LEVEL_INFO: Record<number, { prefix: string, discount: number }> = {
   1: { prefix: "Новичок", discount: 0 },
@@ -16,9 +55,17 @@ export const LEVEL_INFO: Record<number, { prefix: string, discount: number }> = 
 export function calculateProfileStats(orders: Order[], backendXP?: number): ProfileStats {
   const favoritesCount = getFavorites().length;
   const cartCount = getCartCount();
-  const catalogOpened = false;
-  const dailyVisit = false;
-  const viewedProducts = 0;
+  const catalogOpened = localStorage.getItem(getTrackingKey("catalog_opened")) === "true";
+  const dailyVisit = localStorage.getItem(getTrackingKey("daily_visit")) === "true";
+  
+  let viewedProducts = 0;
+  try {
+    const viewedStr = localStorage.getItem(getTrackingKey("viewed_products"));
+    const viewed = viewedStr ? JSON.parse(viewedStr) : [];
+    viewedProducts = Array.isArray(viewed) ? viewed.length : 0;
+  } catch (e) {
+    viewedProducts = 0;
+  }
 
   const orderPoints = orders
     .filter(order => order.status !== 'cancelled')

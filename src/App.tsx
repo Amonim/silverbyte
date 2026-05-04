@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { markDailyVisit } from "./utils/profile";
 import Home from "./components/pages/HomePage";
 import Catalog from "./components/pages/CatalogPage";
 import Product from "./components/pages/ProductPage";
@@ -12,6 +13,13 @@ import CheckoutPage from "./components/pages/CheckoutPage";
 import ProfilePage from "./components/pages/ProfilePage";
 
 function App() {
+  useEffect(() => {
+    markDailyVisit();
+    const handleAuth = () => markDailyVisit();
+    window.addEventListener("auth-updated", handleAuth);
+    return () => window.removeEventListener("auth-updated", handleAuth);
+  }, []);
+
   return (
     <BrowserRouter>
       <ScrollToTop />

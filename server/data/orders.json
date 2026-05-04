@@ -31,7 +31,7 @@
       "comment": "домофон не работает"
     },
     "paymentMethod": "Оплата при получении",
-    "status": "pending",
+    "status": "cancelled",
     "userPrefix": "Новичок",
     "userEmail": "aryn.abiev@mail.ru",
     "xp": 1179
@@ -112,9 +112,69 @@
       "comment": "домофон не работает"
     },
     "paymentMethod": "Оплата при получении",
-    "status": "pending",
+    "status": "cancelled",
     "userPrefix": "VIP",
     "userEmail": "aryn.abiev@mail.ru",
     "xp": 353
+  },
+  {
+    "id": "f1d56e9a-1307-468f-876a-32b0bf3f1edc",
+    "orderNumber": "ORD-441081",
+    "date": "2026-05-04T04:47:36.284Z",
+    "items": [
+      {
+        "id": 1,
+        "title": "iPhone 15 Pro",
+        "price": 649990,
+        "image": "/images/iphone_15_pro_1.png",
+        "quantity": 1
+      }
+    ],
+    "subtotal": 649990,
+    "discountPercent": 0,
+    "discountAmount": 0,
+    "total": 649990,
+    "customerInfo": {
+      "fullName": "Ондарбекавич Абиев Арын",
+      "phone": "+77761488104",
+      "city": "Павлодар",
+      "address": "Камзина 20",
+      "comment": "домофон не работает"
+    },
+    "paymentMethod": "Оплата при получении",
+    "status": "cancelled",
+    "userPrefix": "Новичок",
+    "userEmail": "aryn.abiev@mail.ru",
+    "xp": 649
+  },
+  {
+    "id": "ff359a4a-65b5-4535-97a9-8f0e5b1b7b2c",
+    "orderNumber": "ORD-327001",
+    "date": "2026-05-04T06:02:59.824Z",
+    "items": [
+      {
+        "id": 1,
+        "title": "iPhone 15 Pro",
+        "price": 649990,
+        "image": "/images/iphone_15_pro_1.png",
+        "quantity": 2
+      }
+    ],
+    "subtotal": 1299980,
+    "discountPercent": 0,
+    "discountAmount": 0,
+    "total": 1299980,
+    "customerInfo": {
+      "fullName": "Арын Ондарбекавич Абиев",
+      "phone": "+77761488104",
+      "city": "Павлодар",
+      "address": "Камзина 20",
+      "comment": "домофон не работает"
+    },
+    "paymentMethod": "Оплата при получении",
+    "status": "cancelled",
+    "userPrefix": "Новичок",
+    "userEmail": "aryn.abiev@mail.ru",
+    "xp": 1299
   }
 ]

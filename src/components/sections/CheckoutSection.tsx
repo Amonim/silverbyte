@@ -116,9 +116,6 @@ function CheckoutSection() {
       navigate("/profile");
     } catch (err) {
       console.error(err);
-      // Still navigate or show error?
-      // Requirement: "if backend request fails, do not crash the page. show empty orders or keep current safe fallback"
-      // I'll still navigate for now as a fallback, but at least we tried to await.
       clearCart();
       navigate("/profile");
     }

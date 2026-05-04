@@ -34,6 +34,8 @@ function ProfileSection() {
 
   useEffect(() => {
     loadProfileData();
+    window.addEventListener("profile-updated", loadProfileData);
+    return () => window.removeEventListener("profile-updated", loadProfileData);
   }, [user]);
 
   const handleCancelClick = async (orderId: string) => {

@@ -1,7 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-// Restore theme immediately to prevent flashing and ensure components detect it on mount
 const savedTheme = localStorage.getItem("theme");
 if (savedTheme === "light" || savedTheme === "dark") {
   document.documentElement.setAttribute("data-theme", savedTheme);

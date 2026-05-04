@@ -46,7 +46,7 @@ export async function getUserOrders(userEmail: string): Promise<Order[]> {
     return await response.json();
   } catch (error) {
     console.error("Error fetching user orders:", error);
-    return []; // Return empty array as safe fallback
+    return [];
   }
 }
 
