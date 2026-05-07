@@ -166,11 +166,10 @@ export function calculateProfileStats(orders: Order[], backendXP?: number): Prof
 
   let points = typeof backendXP === 'number' ? backendXP : 100 + orderPoints;
 
-  if (typeof backendXP !== 'number') {
-    achievements.forEach(ach => {
-      if (ach.completed) points += ach.reward;
-    });
-  }
+  achievements.forEach(ach => {
+    if (ach.completed) points += ach.reward;
+  });
+
 
   let level = 1;
   let nextLevelPoints = LEVELS[1];

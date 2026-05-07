@@ -276,9 +276,83 @@
       "comment": "домофон не работает"
     },
     "paymentMethod": "Оплата при получении",
-    "status": "pending",
+    "status": "cancelled",
     "userPrefix": "Новичок",
     "userEmail": "aryn.abiev@mail.ru",
     "xp": 1829
+  },
+  {
+    "id": "69145729-0ab2-485f-8bcc-d0fba8a9693a",
+    "orderNumber": "ORD-625589",
+    "date": "2026-05-07T09:40:47.831Z",
+    "items": [
+      {
+        "id": 1,
+        "title": "iPhone 15 Pro",
+        "price": 649990,
+        "image": "/images/iphone_15_pro_1.png",
+        "quantity": 2
+      },
+      {
+        "id": 2,
+        "title": "Samsung Galaxy S24",
+        "price": 529990,
+        "image": "/images/Samsung_Galaxy_S24_1.png",
+        "quantity": 2
+      }
+    ],
+    "subtotal": 2359960,
+    "discountPercent": 0,
+    "discountAmount": 0,
+    "total": 2359960,
+    "customerInfo": {
+      "fullName": "Абиев Арын Ондарбекавич",
+      "phone": "+77761488104",
+      "city": "Павлодар",
+      "address": "Камзина 20",
+      "comment": "домофон не работает"
+    },
+    "paymentMethod": "Оплата при получении",
+    "status": "cancelled",
+    "userPrefix": "Новичок",
+    "userEmail": "aryn.abiev@mail.ru",
+    "xp": 2359
+  },
+  {
+    "id": "352a143a-f640-45cf-be5a-5a1642b05d07",
+    "orderNumber": "ORD-422707",
+    "date": "2026-05-07T09:41:01.434Z",
+    "items": [
+      {
+        "id": 1,
+        "title": "iPhone 15 Pro",
+        "price": 649990,
+        "image": "/images/iphone_15_pro_1.png",
+        "quantity": 2
+      },
+      {
+        "id": 2,
+        "title": "Samsung Galaxy S24",
+        "price": 529990,
+        "image": "/images/Samsung_Galaxy_S24_1.png",
+        "quantity": 1
+      }
+    ],
+    "subtotal": 1829970,
+    "discountPercent": 5,
+    "discountAmount": 91499,
+    "total": 1738471,
+    "customerInfo": {
+      "fullName": "Абиев Арын Ондарбекавич",
+      "phone": "+77761488104",
+      "city": "Павлодар",
+      "address": "Камзина 20",
+      "comment": "домофон не работает"
+    },
+    "paymentMethod": "Оплата при получении",
+    "status": "cancelled",
+    "userPrefix": "Коллекционер",
+    "userEmail": "aryn.abiev@mail.ru",
+    "xp": 1738
   }
 ]

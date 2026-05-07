@@ -121,7 +121,6 @@
   overflow-y: auto;
 }
 
-/* Dashboard Cards */
 .admin-dashboard__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -153,7 +152,6 @@
   color: var(--color-text);
 }
 
-/* Tables */
 .admin-table-container {
   background-color: var(--color-surface);
   border-radius: var(--radius-lg);
@@ -346,7 +344,7 @@
   cursor: pointer;
 }
 
-/* Auth */
+
 .admin-login {
   min-height: 100vh;
   display: flex;
@@ -447,20 +445,24 @@
   .admin-layout {
     flex-direction: column;
   }
+
   .admin-sidebar {
     width: 100%;
     height: auto;
     position: static;
   }
+
   .admin-sidebar__nav {
     flex-direction: row;
     flex-wrap: wrap;
     padding: 16px;
   }
+
   .admin-sidebar__link {
     flex: 1;
     justify-content: center;
   }
+
   .admin-table-container {
     overflow-x: auto;
   }
