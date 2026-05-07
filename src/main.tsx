@@ -22,6 +22,7 @@ import './styles/profile.css'
 import './styles/chatbot.css'
 import './styles/theme.css'
 import './styles/responsive.css'
+import './styles/admin.css'
 import App from "./App.tsx";
 
 createRoot(document.getElementById("root")!).render(

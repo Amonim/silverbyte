@@ -11,7 +11,12 @@ import FavoritesPage from "./components/pages/FavoritesPage";
 import ScrollToTop from "./components/ScrollToTop";
 import CheckoutPage from "./components/pages/CheckoutPage";
 import ProfilePage from "./components/pages/ProfilePage";
-
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminLoginPage from "./components/pages/admin/AdminLoginPage";
+import AdminDashboardPage from "./components/pages/admin/AdminDashboardPage";
+import AdminProductsPage from "./components/pages/admin/AdminProductsPage";
+import AdminOrdersPage from "./components/pages/admin/AdminOrdersPage";
+import AdminUsersPage from "./components/pages/admin/AdminUsersPage";
 function App() {
   useEffect(() => {
     markDailyVisit();
@@ -33,6 +38,15 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+
+        {/* Admin Routes */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboardPage />} />
+          <Route path="products" element={<AdminProductsPage />} />
+          <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="users" element={<AdminUsersPage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

@@ -176,5 +176,109 @@
     "userPrefix": "Новичок",
     "userEmail": "aryn.abiev@mail.ru",
     "xp": 1299
+  },
+  {
+    "id": "12a58b0e-6fb5-4d14-b54a-432e89918558",
+    "orderNumber": "ORD-645722",
+    "date": "2026-05-04T11:31:39.726Z",
+    "items": [
+      {
+        "id": 1,
+        "title": "iPhone 15 Pro",
+        "price": 649990,
+        "image": "/images/iphone_15_pro_1.png",
+        "quantity": 2
+      },
+      {
+        "id": 2,
+        "title": "Samsung Galaxy S24",
+        "price": 529990,
+        "image": "/images/Samsung_Galaxy_S24_1.png",
+        "quantity": 2
+      }
+    ],
+    "subtotal": 2359960,
+    "discountPercent": 0,
+    "discountAmount": 0,
+    "total": 2359960,
+    "customerInfo": {
+      "fullName": "Абиев Арын Ондарбекавич",
+      "phone": "+77761488104",
+      "city": "Павлодар",
+      "address": "Камзина 20",
+      "comment": "домофон не работает"
+    },
+    "paymentMethod": "Оплата при получении",
+    "status": "cancelled",
+    "userPrefix": "Новичок",
+    "userEmail": "aryn.abiev@mail.ru",
+    "xp": 2359
+  },
+  {
+    "id": "afa0b0df-f608-4812-a9aa-7d8f20d1a14f",
+    "orderNumber": "ORD-820290",
+    "date": "2026-05-04T16:50:18.638Z",
+    "items": [
+      {
+        "id": 1,
+        "title": "iPhone 15 Pro",
+        "price": 649990,
+        "image": "/images/iphone_15_pro_1.png",
+        "quantity": 2
+      }
+    ],
+    "subtotal": 1299980,
+    "discountPercent": 0,
+    "discountAmount": 0,
+    "total": 1299980,
+    "customerInfo": {
+      "fullName": "Ондарбекавич Абиев Арын",
+      "phone": "+77761488104",
+      "city": "Павлодар",
+      "address": "Камзина 20",
+      "comment": "домофон не работает"
+    },
+    "paymentMethod": "Оплата при получении",
+    "status": "cancelled",
+    "userPrefix": "Новичок",
+    "userEmail": "aryn.abiev@mail.ru",
+    "xp": 1299
+  },
+  {
+    "id": "655a2b98-7634-4e2c-af46-16271bc9dc7f",
+    "orderNumber": "ORD-231539",
+    "date": "2026-05-07T09:39:49.900Z",
+    "items": [
+      {
+        "id": 1,
+        "title": "iPhone 15 Pro",
+        "price": 649990,
+        "image": "/images/iphone_15_pro_1.png",
+        "quantity": 2
+      },
+      {
+        "id": 2,
+        "title": "Samsung Galaxy S24",
+        "price": 529990,
+        "image": "/images/Samsung_Galaxy_S24_1.png",
+        "quantity": 1
+      }
+    ],
+    "subtotal": 1829970,
+    "discountPercent": 0,
+    "discountAmount": 0,
+    "total": 1829970,
+    "customerInfo": {
+      "fullName": "Арын Ондарбекавич Абиев",
+      "phone": "+77761488104",
+      "city": "Павлодар",
+      "address": "Камзина 20",
+      "comment": "домофон не работает"
+    },
+    "paymentMethod": "Оплата при получении",
+    "status": "pending",
+    "userPrefix": "Новичок",
+    "userEmail": "aryn.abiev@mail.ru",
+    "xp": 1829
   }
 ]
