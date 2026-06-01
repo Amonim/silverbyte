@@ -49,6 +49,32 @@ app.get('/api/db-test', async (req, res) => {
   }
 });
 
+app.get('/api/products', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM products ORDER BY id ASC');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Failed to fetch products' });
+  }
+});
+
+app.get('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    res.status(500).json({ error: 'Failed to fetch product' });
+  }
+});
+
 app.post('/api/orders', async (req, res) => {
   try {
     const order = req.body;
