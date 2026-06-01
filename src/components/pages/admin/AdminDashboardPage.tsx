@@ -8,38 +8,38 @@ const AdminDashboardPage = () => {
 
   return (
     <div>
-      <h2 style={{ marginBottom: "24px" }}>Dashboard</h2>
+      <h2 style={{ marginBottom: "24px" }}>Панель управления</h2>
 
       <div className="admin-dashboard__grid">
         <div className="admin-card">
-          <div className="admin-card__title">💰 Total Revenue</div>
+          <div className="admin-card__title">💰 Общий доход</div>
           <div className="admin-card__value">
             {totalRevenue.toLocaleString("ru-RU")} ₸
           </div>
         </div>
         <div className="admin-card">
-          <div className="admin-card__title">🛒 Total Orders</div>
+          <div className="admin-card__title">🛒 Всего заказов</div>
           <div className="admin-card__value">{mockAdminOrders.length}</div>
         </div>
         <div className="admin-card">
-          <div className="admin-card__title">👥 Total Users</div>
+          <div className="admin-card__title">👥 Всего пользователей</div>
           <div className="admin-card__value">{mockAdminUsers.length}</div>
         </div>
         <div className="admin-card">
-          <div className="admin-card__title">📦 Total Products</div>
+          <div className="admin-card__title">📦 Всего товаров</div>
           <div className="admin-card__value">{products.length}</div>
         </div>
       </div>
 
-      <h3 style={{ marginBottom: "16px" }}>Recent Orders</h3>
+      <h3 style={{ marginBottom: "16px" }}>Последние заказы</h3>
       <div className="admin-table-container">
         <table className="admin-table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Customer</th>
-              <th>Total</th>
-              <th>Status</th>
+              <th>Клиент</th>
+              <th>Сумма</th>
+              <th>Статус</th>
             </tr>
           </thead>
           <tbody>

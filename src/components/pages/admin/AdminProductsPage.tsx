@@ -37,7 +37,7 @@ const AdminProductsPage = () => {
               <option value="computers">Компьютеры</option>
               <option value="periphery">Периферия</option>
             </select>
-            <button className="admin-btn admin-btn--primary">+ Добавить</button>
+            <button className="admin-btn admin-btn--primary">+ Добавить товар</button>
           </div>
         </div>
 

@@ -16,10 +16,10 @@ const AdminLayout = () => {
   };
 
   const navLinks = [
-    { path: "/admin", label: "Dashboard", icon: "📊" },
-    { path: "/admin/products", label: "Products", icon: "📦" },
-    { path: "/admin/orders", label: "Orders", icon: "🛒" },
-    { path: "/admin/users", label: "Users", icon: "👥" },
+    { path: "/admin", label: "Панель управления", icon: "📊" },
+    { path: "/admin/products", label: "Товары", icon: "📦" },
+    { path: "/admin/orders", label: "Заказы", icon: "🛒" },
+    { path: "/admin/users", label: "Пользователи", icon: "👥" },
   ];
 
   return (
@@ -33,9 +33,8 @@ const AdminLayout = () => {
             <Link
               key={link.path}
               to={link.path}
-              className={`admin-sidebar__link ${
-                location.pathname === link.path ? "admin-sidebar__link--active" : ""
-              }`}
+              className={`admin-sidebar__link ${location.pathname === link.path ? "admin-sidebar__link--active" : ""
+                }`}
             >
               <span>{link.icon}</span>
               {link.label}
