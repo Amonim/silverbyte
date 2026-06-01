@@ -5,5 +5,9 @@
     "email": "aryn.abiev@mail.ru",
     "password": "qwerty",
     "xp": 0
+  },
+  {
+    "email": "ivan@mail.ru",
+    "xp": 649
   }
 ]

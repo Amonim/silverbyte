@@ -76,45 +76,111 @@ app.get('/api/products/:id', async (req, res) => {
 });
 
 app.post('/api/orders', async (req, res) => {
+  const client = await pool.connect();
   try {
     const order = req.body;
     
     const xp = Math.floor(order.total / 1000);
     order.xp = xp;
 
-    const data = await fs.readFile(ORDERS_FILE, 'utf-8');
-    const orders = JSON.parse(data);
-    orders.push(order);
-    await fs.writeFile(ORDERS_FILE, JSON.stringify(orders, null, 2));
+    await client.query('BEGIN');
 
-    if (order.userEmail) {
-      const usersData = await fs.readFile(USERS_FILE, 'utf-8');
-      const users = JSON.parse(usersData);
-      const userIndex = users.findIndex((u: any) => u.email === order.userEmail);
-
-      if (userIndex !== -1) {
-        users[userIndex].xp += xp;
-      } else {
-        users.push({ email: order.userEmail, xp });
+    // 1. Check products
+    for (const item of order.items) {
+      const productCheck = await client.query('SELECT id FROM products WHERE id = $1', [item.id]);
+      if (productCheck.rows.length === 0) {
+        throw new Error(`Product with ID ${item.id} not found`);
       }
-      await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
+    }
+
+    // 2. Insert order
+    await client.query(
+      `INSERT INTO orders 
+       (id, order_number, date, subtotal, discount_percent, discount_amount, total, customer_info, payment_method, status, user_prefix, user_email, xp)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+      [
+        order.id, order.orderNumber, order.date, order.subtotal, 
+        order.discountPercent, order.discountAmount, order.total, 
+        JSON.stringify(order.customerInfo), order.paymentMethod, 
+        order.status, order.userPrefix, order.userEmail, xp
+      ]
+    );
+
+    // 3. Insert order items
+    for (const item of order.items) {
+      await client.query(
+        `INSERT INTO order_items (order_id, product_id, quantity, price_at_purchase)
+         VALUES ($1, $2, $3, $4)`,
+        [order.id, item.id, item.quantity, item.price]
+      );
+    }
+
+    await client.query('COMMIT');
+
+    // Update users.json
+    if (order.userEmail) {
+      try {
+        const usersData = await fs.readFile(USERS_FILE, 'utf-8');
+        const users = JSON.parse(usersData);
+        const userIndex = users.findIndex((u: any) => u.email === order.userEmail);
+
+        if (userIndex !== -1) {
+          users[userIndex].xp += xp;
+        } else {
+          users.push({ email: order.userEmail, xp });
+        }
+        await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
+      } catch (userErr) {
+        console.error('Failed to update users.json:', userErr);
+      }
     }
 
     res.status(201).json(order);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to save order' });
+  } catch (error: any) {
+    await client.query('ROLLBACK');
+    console.error('Failed to save order:', error);
+    res.status(500).json({ error: error.message || 'Failed to save order' });
+  } finally {
+    client.release();
   }
 });
 
-app.get('/api/orders/:userEmail', async (req, res) => {
+app.get('/api/orders', async (req, res) => {
   try {
-    const { userEmail } = req.params;
-    const data = await fs.readFile(ORDERS_FILE, 'utf-8');
-    const orders = JSON.parse(data);
-    const userOrders = orders.filter((o: any) => o.userEmail === userEmail);
-    res.json(userOrders);
+    const result = await pool.query('SELECT * FROM orders ORDER BY date DESC');
+    res.json(result.rows);
   } catch (error) {
+    console.error('Error fetching orders:', error);
     res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+});
+
+app.get('/api/orders/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // UUID format check (simple regex to avoid crashing if id is a userEmail from old endpoints)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      // Fallback to fetch by userEmail for compatibility if needed
+      const result = await pool.query('SELECT * FROM orders WHERE user_email = $1 ORDER BY date DESC', [id]);
+      return res.json(result.rows);
+    }
+
+    const orderResult = await pool.query('SELECT * FROM orders WHERE id = $1', [id]);
+    
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    
+    const order = orderResult.rows[0];
+    const itemsResult = await pool.query('SELECT * FROM order_items WHERE order_id = $1', [id]);
+    order.items = itemsResult.rows;
+    
+    res.json(order);
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    res.status(500).json({ error: 'Failed to fetch order' });
   }
 });
 
