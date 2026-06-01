@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import fs from 'fs/promises';
 import path from 'path';
+import pool from './db';
 
 dotenv.config();
 
@@ -36,6 +37,16 @@ initStorage();
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
+});
+
+app.get('/api/db-test', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    res.json({ success: true, time: result.rows[0].now });
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(500).json({ success: false, error: 'Database connection failed' });
+  }
 });
 
 app.post('/api/orders', async (req, res) => {
