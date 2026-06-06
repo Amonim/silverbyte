@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import useProfile from "../../hooks/useProfile";
-import { getUserOrders, getUserXP, cancelOrder } from "../../utils/ordersApi";
+import { getUserOrders, getUserXP, cancelOrder } from "../../api/ordersApi";
 import { calculateProfileStats } from "../../utils/profile";
 
 import type { Order } from "../../types/order";

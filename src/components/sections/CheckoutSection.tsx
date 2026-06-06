@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import useCart from "../../hooks/useCart";
 import useAuth from "../../hooks/useAuth";
 import useProfile from "../../hooks/useProfile";
 import { createOrderNumber } from "../../utils/orders";
-import { createOrder, getUserXP } from "../../utils/ordersApi";
+import { createOrder, getUserXP } from "../../api/ordersApi";
 import { calculateProfileStats } from "../../utils/profile";
 import type { OrderCustomerInfo } from "../../types/order";
 import type { ProfileStats } from "../../types/profile";
@@ -13,10 +13,13 @@ import { useEffect } from "react";
 function CheckoutSection() {
   const { items, total, clearCart } = useCart();
   const { user, authenticated } = useAuth();
-  const { stats } = useProfile();
-  const navigate = useNavigate();
+  useProfile(); // just call it if we need the effect, otherwise let's just leave it out if we don't need `stats`
+  // Actually, wait, useProfile provides the initial loading of profile data. Let's just destructure nothing.
+  
   const [successOrder, setSuccessOrder] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [backendStats, setBackendStats] = useState<ProfileStats | null>(null);
 
   useEffect(() => {
@@ -111,13 +114,16 @@ function CheckoutSection() {
     const finalOrder = { ...newOrder, userEmail: user.email };
 
     try {
+      setIsLoading(true);
+      setSubmitError(null);
       await createOrder(finalOrder);
       clearCart();
-      navigate("/profile");
-    } catch (err) {
+      setSuccessOrder(newOrderNumber);
+    } catch (err: any) {
       console.error(err);
-      clearCart();
-      navigate("/profile");
+      setSubmitError("Не удалось оформить заказ. Попробуйте еще раз.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -199,6 +205,7 @@ function CheckoutSection() {
               <h2 className="checkout__form-title">
                 Данные получателя
               </h2>
+              {submitError && <div style={{ color: "red", marginBottom: "15px", fontWeight: "bold" }}>{submitError}</div>}
 
               <input
                 type="text"
@@ -257,8 +264,8 @@ function CheckoutSection() {
                 <strong>Способ оплаты:</strong> Оплата при получении
               </div>
 
-              <button className="checkout__button" type="submit">
-                Подтвердить заказ
+              <button className="checkout__button" type="submit" disabled={isLoading}>
+                {isLoading ? "Оформление..." : "Подтвердить заказ"}
               </button>
             </form>
           </div>
