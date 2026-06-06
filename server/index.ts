@@ -75,6 +75,79 @@ app.get('/api/products/:id', async (req, res) => {
   }
 });
 
+app.post('/api/products', async (req, res) => {
+  try {
+    const { title, category, price, images, description, specs } = req.body;
+    if (!title || !category || price === undefined || !images || !description || !specs) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
+    // We pass specs as JSON string, and images as JSON string (or array if node-postgres supports it, let's pass stringified JSON)
+    const result = await pool.query(
+      `INSERT INTO products (title, category, price, images, description, specs) 
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [title, category, price, JSON.stringify(images), description, JSON.stringify(specs)]
+    );
+    
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error creating product:', error);
+    res.status(500).json({ error: 'Failed to create product' });
+  }
+});
+
+app.patch('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, category, price, images, description, specs } = req.body;
+    
+    if (!title || !category || price === undefined || !images || !description || !specs) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
+    const result = await pool.query(
+      `UPDATE products 
+       SET title = $1, category = $2, price = $3, images = $4, description = $5, specs = $6
+       WHERE id = $7 RETURNING *`,
+      [title, category, price, JSON.stringify(images), description, JSON.stringify(specs), id]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(500).json({ error: 'Failed to update product' });
+  }
+});
+
+app.delete('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const orderCheck = await pool.query('SELECT order_id FROM order_items WHERE product_id = $1 LIMIT 1', [id]);
+    
+    if (orderCheck.rows.length > 0) {
+      return res.status(400).json({ 
+        error: 'Невозможно удалить товар: он содержится в существующих заказах.' 
+      });
+    }
+    
+    const result = await pool.query('DELETE FROM products WHERE id = $1 RETURNING *', [id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    
+    res.json({ success: true, message: 'Product deleted' });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    res.status(500).json({ error: 'Failed to delete product' });
+  }
+});
+
 app.post('/api/orders', async (req, res) => {
   const client = await pool.connect();
   try {

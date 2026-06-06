@@ -30,3 +30,44 @@ export const getProductById = async (id: number): Promise<Product | undefined> =
     return localProducts.find((p) => p.id === id);
   }
 };
+
+export const createProduct = async (product: Omit<Product, 'id'>): Promise<Product> => {
+  const response = await fetch(`${API_URL}/products`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(product),
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+  }
+  
+  return await response.json();
+};
+
+export const updateProduct = async (id: number, product: Partial<Product>): Promise<Product> => {
+  const response = await fetch(`${API_URL}/products/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(product),
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+  }
+  
+  return await response.json();
+};
+
+export const deleteProduct = async (id: number): Promise<void> => {
+  const response = await fetch(`${API_URL}/products/${id}`, {
+    method: 'DELETE',
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+  }
+};
