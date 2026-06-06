@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { products } from "../../data/product";
 import { addToCart } from "../../utils/cart";
 import FavoriteButton from "../product/FavoriteButton";
+import { getProducts } from "../../api/productsApi";
+import type { Product } from "../../data/product";
 
 const PRODUCTS_PER_PAGE = 9;
 
@@ -14,6 +15,19 @@ function CatalogSection() {
   const [category, setCategory] = useState(queryCategory || "all");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("default");
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      const data = await getProducts();
+      setProducts(data);
+      setIsLoading(false);
+    };
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     if (queryCategory) {
@@ -131,6 +145,11 @@ function CatalogSection() {
     <section className="catalog">
       <div className="container">
         <h1 className="catalog__title">Каталог товаров</h1>
+
+        {isLoading ? (
+          <p>Загрузка каталога...</p>
+        ) : (
+          <>
 
         {searchQuery && (
           <p className="catalog__search-result">
@@ -341,6 +360,8 @@ function CatalogSection() {
             )}
           </div>
         </div>
+        </>
+        )}
       </div>
     </section>
   );

@@ -1,24 +1,60 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { products } from "../../data/product";
 import RelatedProduct from "../product/RelatedProduct";
 import { addToCart } from "../../utils/cart";
 import FavoriteButton from "../product/FavoriteButton";
 import { markProductViewed } from "../../utils/profile";
+import { getProductById, getProducts } from "../../api/productsApi";
+import type { Product } from "../../data/product";
 
 export default function ProductSection() {
   const { id } = useParams();
-  const product = products.find((item) => item.id === Number(id));
+  
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [activeImage, setActiveImage] = useState(0);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchProductData = async () => {
+      setIsLoading(true);
+      const productData = await getProductById(Number(id));
+      if (productData) {
+        setProduct(productData);
+        const allProducts = await getProducts();
+        setRelatedProducts(
+          allProducts
+            .filter(
+              (item) => item.category === productData.category && item.id !== productData.id,
+            )
+            .slice(0, 3)
+        );
+      } else {
+        setProduct(null);
+      }
+      setIsLoading(false);
+    };
+    fetchProductData();
+  }, [id]);
 
   useEffect(() => {
     setActiveImage(0);
     if (product) {
       markProductViewed(product.id);
     }
-  }, [id, product]);
+  }, [product]);
+
+  if (isLoading) {
+    return (
+      <section className="product">
+        <div className="container">
+          <p>Загрузка товара...</p>
+        </div>
+      </section>
+    );
+  }
 
   if (!product) {
     return (
@@ -30,11 +66,7 @@ export default function ProductSection() {
     );
   }
 
-  const relatedProducts = products
-    .filter(
-      (item) => item.category === product.category && item.id !== product.id,
-    )
-    .slice(0, 3);
+
 
   return (
     <>

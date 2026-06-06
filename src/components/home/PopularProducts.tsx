@@ -1,12 +1,37 @@
 import { Link } from "react-router-dom";
-import { products } from "../../data/product";
 import { addToCart } from "../../utils/cart";
 import FavoriteButton from "../product/FavoriteButton";
+import { useEffect, useState } from "react";
+import { getProducts } from "../../api/productsApi";
+import type { Product } from "../../data/product";
 
 function PopularProducts() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      const data = await getProducts();
+      setProducts(data);
+      setIsLoading(false);
+    };
+    fetchProducts();
+  }, []);
+
   const popularProducts = products.filter((product) =>
     [1, 7, 14, 25].includes(product.id),
   );
+
+  if (isLoading) {
+    return (
+      <section className="popular-products">
+        <div className="container">
+          <p>Загрузка популярных товаров...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="popular-products">
