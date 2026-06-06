@@ -117,8 +117,22 @@ app.post('/api/orders', async (req, res) => {
 
     await client.query('COMMIT');
 
-    // Update users.json
+    // Update Postgres users table
     if (order.userEmail) {
+      try {
+        const userCheck = await client.query('SELECT xp FROM users WHERE email = $1', [order.userEmail]);
+        if (userCheck.rows.length > 0) {
+          const newXp = userCheck.rows[0].xp + xp;
+          let level = 1;
+          const LEVELS = [0, 300, 700, 1500, 3000];
+          for (let i = 0; i < LEVELS.length; i++) if (newXp >= LEVELS[i]) level = i + 1;
+          if (level > 5) level = 5;
+          await client.query('UPDATE users SET xp = $1, level = $2 WHERE email = $3', [newXp, level, order.userEmail]);
+        }
+      } catch (dbErr) {
+        console.error('Failed to update user XP in database:', dbErr);
+      }
+      
       try {
         const usersData = await fs.readFile(USERS_FILE, 'utf-8');
         const users = JSON.parse(usersData);
@@ -184,20 +198,36 @@ app.get('/api/orders/:id', async (req, res) => {
   }
 });
 
-app.get('/api/users/:email', async (req, res) => {
+app.get('/api/users', async (req, res) => {
   try {
-    const { email } = req.params;
-    const data = await fs.readFile(USERS_FILE, 'utf-8');
-    const users = JSON.parse(data);
-    const user = users.find((u: any) => u.email === email);
+    const result = await pool.query('SELECT id, name, email, xp, level FROM users ORDER BY id ASC');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+app.get('/api/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
     
-    if (user) {
-      const { password, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
+    // Support fetching by email for backward compatibility with old endpoints
+    let result;
+    if (id.includes('@')) {
+      result = await pool.query('SELECT id, name, email, xp, level FROM users WHERE email = $1', [id]);
     } else {
-      res.json({ email, xp: 0 });
+      result = await pool.query('SELECT id, name, email, xp, level FROM users WHERE id = $1', [id]);
+    }
+    
+    if (result.rows.length > 0) {
+      res.json(result.rows[0]);
+    } else {
+      // Fallback for guest users
+      res.json({ email: id.includes('@') ? id : '', xp: 0, level: 1 });
     }
   } catch (error) {
+    console.error('Error fetching user:', error);
     res.status(500).json({ error: 'Failed to fetch user' });
   }
 });
@@ -226,12 +256,26 @@ app.patch('/api/orders/:orderId/cancel', async (req, res) => {
     await fs.writeFile(ORDERS_FILE, JSON.stringify(orders, null, 2));
 
     if (userEmail) {
+      const orderXP = order.xp || Math.floor(order.total / 1000);
+      try {
+        const userCheck = await pool.query('SELECT xp FROM users WHERE email = $1', [userEmail]);
+        if (userCheck.rows.length > 0) {
+          const newXp = Math.max(0, userCheck.rows[0].xp - orderXP);
+          let level = 1;
+          const LEVELS = [0, 300, 700, 1500, 3000];
+          for (let i = 0; i < LEVELS.length; i++) if (newXp >= LEVELS[i]) level = i + 1;
+          if (level > 5) level = 5;
+          await pool.query('UPDATE users SET xp = $1, level = $2 WHERE email = $3', [newXp, level, userEmail]);
+        }
+      } catch (dbErr) {
+        console.error('Failed to update user XP in database:', dbErr);
+      }
+
       const usersData = await fs.readFile(USERS_FILE, 'utf-8');
       const users = JSON.parse(usersData);
       const userIndex = users.findIndex((u: any) => u.email === userEmail);
 
       if (userIndex !== -1) {
-        const orderXP = order.xp || Math.floor(order.total / 1000);
         users[userIndex].xp = Math.max(0, (users[userIndex].xp || 0) - orderXP);
         await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
       }
@@ -243,49 +287,39 @@ app.patch('/api/orders/:orderId/cancel', async (req, res) => {
   }
 });
 
-app.post('/api/auth/register', async (req, res) => {
+app.post('/api/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    const data = await fs.readFile(USERS_FILE, 'utf-8');
-    const users = JSON.parse(data);
     
-    const existingUser = users.find((u: any) => u.email === email);
-    if (existingUser) {
+    const existingUser = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    if (existingUser.rows.length > 0) {
       return res.status(400).json({ error: 'Пользователь с таким email уже существует' });
     }
 
-    const newUser = {
-      id: Date.now(),
-      name,
-      email,
-      password,
-      xp: 0
-    };
+    const result = await pool.query(
+      'INSERT INTO users (name, email, password, xp, level) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, xp, level',
+      [name, email, password, 0, 1]
+    );
 
-    users.push(newUser);
-    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
-
-    const { password: _, ...userWithoutPassword } = newUser;
-    res.status(201).json(userWithoutPassword);
+    res.status(201).json(result.rows[0]);
   } catch (error) {
+    console.error('Registration error:', error);
     res.status(500).json({ error: 'Failed to register user' });
   }
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    const data = await fs.readFile(USERS_FILE, 'utf-8');
-    const users = JSON.parse(data);
     
-    const user = users.find((u: any) => u.email === email && u.password === password);
-    if (!user) {
+    const result = await pool.query('SELECT id, name, email, xp, level FROM users WHERE email = $1 AND password = $2', [email, password]);
+    if (result.rows.length === 0) {
       return res.status(401).json({ error: 'Неверный email или пароль' });
     }
 
-    const { password: _, ...userWithoutPassword } = user;
-    res.json(userWithoutPassword);
+    res.json(result.rows[0]);
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ error: 'Failed to login' });
   }
 });
