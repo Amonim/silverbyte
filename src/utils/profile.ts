@@ -2,7 +2,7 @@ import type { Order } from "../types/order";
 import type { ProfileStats, Achievement } from "../types/profile";
 import { getFavorites } from "./favorites";
 import { getCartCount } from "./cart";
-import { getCurrentUser } from "./auth";
+import { getCurrentUser } from "../api/authApi";
 
 const LEVELS = [0, 300, 700, 1500, 3000];
 

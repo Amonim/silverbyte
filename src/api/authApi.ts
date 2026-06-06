@@ -1,4 +1,4 @@
-import type { CurrentUser, User } from '../types/auth'
+import type { CurrentUser } from '../types/auth'
 
 const CURRENT_USER_KEY = 'sb_current_user'
 
@@ -42,7 +42,7 @@ export async function registerUser(
   password: string
 ): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    const response = await fetch(`${API_BASE_URL}/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ export async function registerUser(
   } catch (error) {
     return {
       success: false,
-      message: 'Ошибка соединения с сервером',
+      message: 'Ошибка соединения с сервером. Пожалуйста, убедитесь, что backend запущен.',
     }
   }
 }
@@ -82,7 +82,7 @@ export async function loginUser(
   password: string
 ): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ export async function loginUser(
   } catch (error) {
     return {
       success: false,
-      message: 'Ошибка соединения с сервером',
+      message: 'Ошибка соединения с сервером. Пожалуйста, убедитесь, что backend запущен.',
     }
   }
 }

@@ -6,7 +6,7 @@ import {
   loginUser,
   logoutUser,
   registerUser,
-} from "../utils/auth";
+} from "../api/authApi";
 
 function useAuth() {
   const [user, setUser] = useState<CurrentUser | null>(getCurrentUser());

@@ -12,6 +12,7 @@ function RegisterSection() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,18 +30,24 @@ function RegisterSection() {
       return;
     }
 
-    const result = await registerUser(name, email, password);
+    setIsLoading(true);
 
-    if (!result.success) {
-      setError(result.message);
-      return;
+    try {
+      const result = await registerUser(name, email, password);
+
+      if (!result.success) {
+        setError(result.message);
+        return;
+      }
+
+      setSuccess(result.message);
+
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } finally {
+      setIsLoading(false);
     }
-
-    setSuccess(result.message);
-
-    setTimeout(() => {
-      navigate("/");
-    }, 1000);
   };
 
   return (
@@ -85,8 +92,8 @@ function RegisterSection() {
             {error && <p className="auth__error">{error}</p>}
             {success && <p className="auth__success">{success}</p>}
 
-            <button className="auth__button" type="submit">
-              Зарегистрироваться
+            <button className="auth__button" type="submit" disabled={isLoading}>
+              {isLoading ? "Регистрация..." : "Зарегистрироваться"}
             </button>
           </form>
 

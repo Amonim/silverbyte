@@ -43,7 +43,18 @@ export async function getUserOrders(userEmail: string): Promise<Order[]> {
       throw new Error("Failed to fetch orders");
     }
 
-    return await response.json();
+    const rawOrders = await response.json();
+    return rawOrders.map((order: any) => ({
+      ...order,
+      orderNumber: order.order_number || order.orderNumber,
+      discountPercent: order.discount_percent || order.discountPercent,
+      discountAmount: order.discount_amount || order.discountAmount,
+      customerInfo: order.customer_info || order.customerInfo || {},
+      paymentMethod: order.payment_method || order.paymentMethod,
+      userPrefix: order.user_prefix || order.userPrefix,
+      userEmail: order.user_email || order.userEmail,
+      items: order.items || [],
+    }));
   } catch (error) {
     console.error("Error fetching user orders:", error);
     return [];

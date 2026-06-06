@@ -10,6 +10,7 @@ function LoginSection() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,18 +23,24 @@ function LoginSection() {
       return;
     }
 
-    const result = await loginUser(email, password);
+    setIsLoading(true);
 
-    if (!result.success) {
-      setError(result.message);
-      return;
+    try {
+      const result = await loginUser(email, password);
+
+      if (!result.success) {
+        setError(result.message);
+        return;
+      }
+
+      setSuccess(result.message);
+
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } finally {
+      setIsLoading(false);
     }
-
-    setSuccess(result.message);
-
-    setTimeout(() => {
-      navigate("/");
-    }, 1000);
   };
 
   return (
@@ -62,8 +69,8 @@ function LoginSection() {
             {error && <p className="auth__error">{error}</p>}
             {success && <p className="auth__success">{success}</p>}
 
-            <button className="auth__button" type="submit">
-              Войти
+            <button className="auth__button" type="submit" disabled={isLoading}>
+              {isLoading ? "Вход..." : "Войти"}
             </button>
           </form>
 

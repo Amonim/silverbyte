@@ -100,7 +100,7 @@ function CatalogSection() {
     }
 
     return result;
-  }, [category, searchQuery]);
+  }, [category, searchQuery, products]);
 
   const sortedProducts = useMemo(() => {
     const result = [...filteredProducts];

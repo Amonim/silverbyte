@@ -178,7 +178,12 @@ app.get('/api/orders/:id', async (req, res) => {
     if (!uuidRegex.test(id)) {
       // Fallback to fetch by userEmail for compatibility if needed
       const result = await pool.query('SELECT * FROM orders WHERE user_email = $1 ORDER BY date DESC', [id]);
-      return res.json(result.rows);
+      const orders = result.rows;
+      for (let order of orders) {
+        const itemsResult = await pool.query('SELECT * FROM order_items WHERE order_id = $1', [order.id]);
+        order.items = itemsResult.rows;
+      }
+      return res.json(orders);
     }
 
     const orderResult = await pool.query('SELECT * FROM orders WHERE id = $1', [id]);
@@ -237,23 +242,20 @@ app.patch('/api/orders/:orderId/cancel', async (req, res) => {
     const { orderId } = req.params;
     const { userEmail } = req.body;
 
-    const ordersData = await fs.readFile(ORDERS_FILE, 'utf-8');
-    const orders = JSON.parse(ordersData);
+    const orderResult = await pool.query('SELECT * FROM orders WHERE id = $1 AND user_email = $2', [orderId, userEmail]);
     
-    const orderIndex = orders.findIndex((o: any) => o.id === orderId && o.userEmail === userEmail);
-    
-    if (orderIndex === -1) {
+    if (orderResult.rows.length === 0) {
       return res.status(404).json({ error: 'Order not found' });
     }
 
-    const order = orders[orderIndex];
+    const order = orderResult.rows[0];
 
     if (order.status === 'cancelled') {
       return res.json(order);
     }
 
+    await pool.query('UPDATE orders SET status = $1 WHERE id = $2', ['cancelled', orderId]);
     order.status = 'cancelled';
-    await fs.writeFile(ORDERS_FILE, JSON.stringify(orders, null, 2));
 
     if (userEmail) {
       const orderXP = order.xp || Math.floor(order.total / 1000);
@@ -271,18 +273,23 @@ app.patch('/api/orders/:orderId/cancel', async (req, res) => {
         console.error('Failed to update user XP in database:', dbErr);
       }
 
-      const usersData = await fs.readFile(USERS_FILE, 'utf-8');
-      const users = JSON.parse(usersData);
-      const userIndex = users.findIndex((u: any) => u.email === userEmail);
+      try {
+        const usersData = await fs.readFile(USERS_FILE, 'utf-8');
+        const users = JSON.parse(usersData);
+        const userIndex = users.findIndex((u: any) => u.email === userEmail);
 
-      if (userIndex !== -1) {
-        users[userIndex].xp = Math.max(0, (users[userIndex].xp || 0) - orderXP);
-        await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
+        if (userIndex !== -1) {
+          users[userIndex].xp = Math.max(0, (users[userIndex].xp || 0) - orderXP);
+          await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
+        }
+      } catch (fileErr) {
+        console.error('Failed to update user XP in users.json:', fileErr);
       }
     }
 
     res.json(order);
   } catch (error) {
+    console.error('Failed to cancel order:', error);
     res.status(500).json({ error: 'Failed to cancel order' });
   }
 });

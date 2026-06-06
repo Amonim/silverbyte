@@ -1,4 +1,4 @@
-import { getCurrentUser } from './auth';
+import { getCurrentUser } from '../api/authApi';
 
 const getFavoritesKey = () => {
   const user = getCurrentUser();
