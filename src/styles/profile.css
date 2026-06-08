@@ -223,6 +223,26 @@
   color: #eab308;
 }
 
+.profile__order-status--confirmed {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.profile__order-status--shipped {
+  background: rgba(168, 85, 247, 0.15);
+  color: #a855f7;
+}
+
+.profile__order-status--delivered {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.profile__order-status--cancelled {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
 .profile__empty {
   padding: 60px 24px;
   text-align: center;

@@ -286,6 +286,28 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
+app.get('/api/admin/users', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        u.id, 
+        u.name, 
+        u.email, 
+        u.xp, 
+        u.level, 
+        COUNT(o.id)::int as "ordersCount"
+      FROM users u
+      LEFT JOIN orders o ON u.email = o.user_email
+      GROUP BY u.id, u.name, u.email, u.xp, u.level
+      ORDER BY u.id ASC
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching admin users:', error);
+    res.status(500).json({ error: 'Failed to fetch admin users' });
+  }
+});
+
 app.get('/api/users/:id', async (req, res) => {
   try {
     const { id } = req.params;

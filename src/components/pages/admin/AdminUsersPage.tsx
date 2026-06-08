@@ -1,26 +1,34 @@
-import { useState } from "react";
-import { mockAdminUsers } from "../../../data/adminUsers";
+import { useState, useEffect } from "react";
+import { getAdminUsers, type AdminUser } from "../../../api/usersApi";
 
 const AdminUsersPage = () => {
-  const [users, setUsers] = useState(mockAdminUsers);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const fetchUsers = async () => {
+    try {
+      const data = await getAdminUsers();
+      setUsers(data);
+    } catch (err: any) {
+      setError(err.message || "Ошибка загрузки пользователей");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const filteredUsers = users.filter((u) =>
-    u.username.toLowerCase().includes(search.toLowerCase()) ||
+    u.name.toLowerCase().includes(search.toLowerCase()) ||
     u.email.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleToggleBlock = (id: string) => {
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === id ? { ...user, isBlocked: !user.isBlocked } : user
-      )
-    );
-  };
-
-  const handleDelete = (id: string) => {
-    setUsers((prev) => prev.filter((user) => user.id !== id));
-  };
+  if (loading) return <div style={{ padding: "24px" }}>Загрузка пользователей...</div>;
+  if (error) return <div style={{ padding: "24px", color: "red" }}>{error}</div>;
 
   return (
     <div>
@@ -43,45 +51,31 @@ const AdminUsersPage = () => {
             <tr>
               <th>Пользователь</th>
               <th>Email</th>
-              <th>Регистрация</th>
+              <th>Уровень</th>
+              <th>XP</th>
               <th>Заказы</th>
-              <th>Действия</th>
             </tr>
           </thead>
           <tbody>
             {filteredUsers.map((user) => (
-              <tr key={user.id} style={{ opacity: user.isBlocked ? 0.5 : 1 }}>
+              <tr key={user.id}>
                 <td>
                   <div className="admin-table__user-info">
-                    <img
-                      src={user.avatar}
-                      alt={user.username}
-                      className="admin-table__avatar"
-                    />
-                    <span>{user.username}</span>
+                    <div className="admin-table__avatar" style={{
+                      width: '40px', height: '40px', borderRadius: '50%',
+                      background: 'var(--color-primary)', color: '#fff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontWeight: 'bold', fontSize: '16px'
+                    }}>
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <span>{user.name}</span>
                   </div>
                 </td>
                 <td>{user.email}</td>
-                <td>{new Date(user.registrationDate).toLocaleDateString("ru-RU")}</td>
+                <td>{user.level}</td>
+                <td>{user.xp}</td>
                 <td>{user.ordersCount}</td>
-                <td>
-                  <div className="admin-table__actions">
-                    <button
-                      className="admin-action-btn"
-                      title={user.isBlocked ? "Разблокировать" : "Заблокировать"}
-                      onClick={() => handleToggleBlock(user.id)}
-                    >
-                      {user.isBlocked ? "🔓" : "🔒"}
-                    </button>
-                    <button
-                      className="admin-action-btn admin-action-btn--delete"
-                      title="Удалить"
-                      onClick={() => handleDelete(user.id)}
-                    >
-                      🗑
-                    </button>
-                  </div>
-                </td>
               </tr>
             ))}
           </tbody>
