@@ -10,7 +10,7 @@ const AdminUsersPage = () => {
   const fetchUsers = async () => {
     try {
       const data = await getAdminUsers();
-      setUsers(data);
+      setUsers(Array.isArray(data) ? data : []);
     } catch (err: any) {
       setError(err.message || "Ошибка загрузки пользователей");
     } finally {
@@ -23,8 +23,8 @@ const AdminUsersPage = () => {
   }, []);
 
   const filteredUsers = users.filter((u) =>
-    u.name.toLowerCase().includes(search.toLowerCase()) ||
-    u.email.toLowerCase().includes(search.toLowerCase())
+    (u.name || "").toLowerCase().includes(search.toLowerCase()) ||
+    (u.email || "").toLowerCase().includes(search.toLowerCase())
   );
 
   if (loading) return <div style={{ padding: "24px" }}>Загрузка пользователей...</div>;
@@ -67,15 +67,15 @@ const AdminUsersPage = () => {
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontWeight: 'bold', fontSize: '16px'
                     }}>
-                      {user.name.charAt(0).toUpperCase()}
+                      {(user.name || "Б").charAt(0).toUpperCase()}
                     </div>
-                    <span>{user.name}</span>
+                    <span>{user.name || "Без имени"}</span>
                   </div>
                 </td>
-                <td>{user.email}</td>
-                <td>{user.level}</td>
-                <td>{user.xp}</td>
-                <td>{user.ordersCount}</td>
+                <td>{user.email || "Без email"}</td>
+                <td>{user.level || 1}</td>
+                <td>{user.xp || 0}</td>
+                <td>{Number(user.ordersCount) || 0}</td>
               </tr>
             ))}
           </tbody>
