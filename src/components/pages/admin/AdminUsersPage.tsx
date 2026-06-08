@@ -141,7 +141,7 @@ const AdminUsersPage = () => {
                     </button>
                     <button
                       className="admin-action-btn admin-action-btn--delete"
-                      title="Удалить"
+                      title="Удалить пользователя"
                       onClick={() => handleDelete(user.id)}
                     >
                       🗑
@@ -169,7 +169,10 @@ const AdminUsersPage = () => {
             <div>
               <label style={{ display: "block", marginBottom: "8px" }}>Имя</label>
               <input 
-                className="input-field"
+                style={{
+                  width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid var(--color-border)",
+                  background: "var(--color-bg)", color: "var(--color-text)", fontSize: "14px", boxSizing: "border-box"
+                }}
                 value={editingUser.name}
                 onChange={e => setEditingUser({...editingUser, name: e.target.value})}
                 required
@@ -180,7 +183,10 @@ const AdminUsersPage = () => {
               <label style={{ display: "block", marginBottom: "8px" }}>Email</label>
               <input 
                 type="email"
-                className="input-field"
+                style={{
+                  width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid var(--color-border)",
+                  background: "var(--color-bg)", color: "var(--color-text)", fontSize: "14px", boxSizing: "border-box"
+                }}
                 value={editingUser.email}
                 onChange={e => setEditingUser({...editingUser, email: e.target.value})}
                 required
@@ -191,7 +197,10 @@ const AdminUsersPage = () => {
               <label style={{ display: "block", marginBottom: "8px" }}>Уровень</label>
               <input 
                 type="number"
-                className="input-field"
+                style={{
+                  width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid var(--color-border)",
+                  background: "var(--color-bg)", color: "var(--color-text)", fontSize: "14px", boxSizing: "border-box"
+                }}
                 value={editingUser.level}
                 onChange={e => setEditingUser({...editingUser, level: Number(e.target.value)})}
                 required
@@ -202,7 +211,10 @@ const AdminUsersPage = () => {
               <label style={{ display: "block", marginBottom: "8px" }}>XP</label>
               <input 
                 type="number"
-                className="input-field"
+                style={{
+                  width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid var(--color-border)",
+                  background: "var(--color-bg)", color: "var(--color-text)", fontSize: "14px", boxSizing: "border-box"
+                }}
                 value={editingUser.xp}
                 onChange={e => setEditingUser({...editingUser, xp: Number(e.target.value)})}
                 required
@@ -210,10 +222,10 @@ const AdminUsersPage = () => {
             </div>
 
             <div style={{ display: "flex", gap: "12px", marginTop: "16px" }}>
-              <button type="submit" className="btn btn--primary" style={{ flex: 1 }}>
+              <button type="submit" className="admin-btn admin-btn--primary" style={{ flex: 1 }}>
                 Сохранить
               </button>
-              <button type="button" className="btn btn--outline" style={{ flex: 1 }} onClick={() => setEditingUser(null)}>
+              <button type="button" className="admin-btn" style={{ flex: 1, border: "1px solid var(--color-border)" }} onClick={() => setEditingUser(null)}>
                 Отмена
               </button>
             </div>
