@@ -1,10 +1,38 @@
 
-import { products } from "../../../data/product";
-import { mockAdminOrders } from "../../../data/adminOrders";
-import { mockAdminUsers } from "../../../data/adminUsers";
+import { useState, useEffect } from "react";
+import { getDashboardData, type DashboardData } from "../../../api/adminDashboardApi";
+
+const statusMap: Record<string, string> = {
+  pending: "В обработке",
+  confirmed: "Подтверждён",
+  shipped: "Передан курьеру",
+  delivered: "Доставлен",
+  cancelled: "Отменён",
+};
 
 const AdminDashboardPage = () => {
-  const totalRevenue = mockAdminOrders.reduce((sum, order) => sum + order.totalPrice, 0);
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const fetchDashboard = async () => {
+    try {
+      const result = await getDashboardData();
+      setData(result);
+    } catch (err: any) {
+      setError(err.message || "Ошибка загрузки панели управления");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboard();
+  }, []);
+
+  if (loading) return <div style={{ padding: "24px" }}>Загрузка панели...</div>;
+  if (error) return <div style={{ padding: "24px", color: "red" }}>{error}</div>;
+  if (!data) return null;
 
   return (
     <div>
@@ -14,20 +42,20 @@ const AdminDashboardPage = () => {
         <div className="admin-card">
           <div className="admin-card__title">💰 Общий доход</div>
           <div className="admin-card__value">
-            {totalRevenue.toLocaleString("ru-RU")} ₸
+            {data.totalRevenue.toLocaleString("ru-RU")} ₸
           </div>
         </div>
         <div className="admin-card">
           <div className="admin-card__title">🛒 Всего заказов</div>
-          <div className="admin-card__value">{mockAdminOrders.length}</div>
+          <div className="admin-card__value">{data.totalOrders}</div>
         </div>
         <div className="admin-card">
           <div className="admin-card__title">👥 Всего пользователей</div>
-          <div className="admin-card__value">{mockAdminUsers.length}</div>
+          <div className="admin-card__value">{data.totalUsers}</div>
         </div>
         <div className="admin-card">
           <div className="admin-card__title">📦 Всего товаров</div>
-          <div className="admin-card__value">{products.length}</div>
+          <div className="admin-card__value">{data.totalProducts}</div>
         </div>
       </div>
 
@@ -43,28 +71,25 @@ const AdminDashboardPage = () => {
             </tr>
           </thead>
           <tbody>
-            {mockAdminOrders.slice(0, 3).map((order) => (
+            {data.recentOrders.map((order) => (
               <tr key={order.id}>
                 <td>{order.id}</td>
                 <td>{order.customerName}</td>
-                <td>{order.totalPrice.toLocaleString("ru-RU")} ₸</td>
+                <td>{Number(order.total).toLocaleString("ru-RU")} ₸</td>
                 <td>
-                  <span
-                    className={`admin-status ${
-                      order.status === "Доставлен"
-                        ? "admin-status--delivered"
-                        : order.status === "Подтвержден"
-                        ? "admin-status--confirmed"
-                        : order.status === "Передан курьеру"
-                        ? "admin-status--shipped"
-                        : "admin-status--pending"
-                    }`}
-                  >
-                    {order.status}
+                  <span className={`admin-status admin-status--${order.status}`}>
+                    {statusMap[order.status] || order.status}
                   </span>
                 </td>
               </tr>
             ))}
+            {data.recentOrders.length === 0 && (
+              <tr>
+                <td colSpan={4} style={{ textAlign: "center", padding: "16px" }}>
+                  Нет заказов
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

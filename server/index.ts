@@ -286,6 +286,61 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
+app.get('/api/admin/dashboard', async (req, res) => {
+  try {
+    const [
+      revenueResult,
+      ordersCountResult,
+      usersCountResult,
+      productsCountResult,
+      recentOrdersResult
+    ] = await Promise.all([
+      pool.query("SELECT SUM(total) as revenue FROM orders WHERE status IN ('confirmed', 'shipped', 'delivered')"),
+      pool.query("SELECT COUNT(*) as count FROM orders"),
+      pool.query("SELECT COUNT(*) as count FROM users"),
+      pool.query("SELECT COUNT(*) as count FROM products"),
+      pool.query("SELECT * FROM orders ORDER BY date DESC LIMIT 5")
+    ]);
+
+    const totalRevenue = Number(revenueResult.rows[0].revenue) || 0;
+    const totalOrders = Number(ordersCountResult.rows[0].count) || 0;
+    const totalUsers = Number(usersCountResult.rows[0].count) || 0;
+    const totalProducts = Number(productsCountResult.rows[0].count) || 0;
+    
+    const recentOrders = recentOrdersResult.rows.map(row => {
+      let customerName = "Неизвестный клиент";
+      try {
+        const info = typeof row.customer_info === 'string' ? JSON.parse(row.customer_info) : row.customer_info;
+        if (info && info.fullName) {
+          customerName = info.fullName;
+        } else if (info && info.name) {
+          customerName = info.name;
+        }
+      } catch(e) {}
+
+      return {
+        id: row.id,
+        orderNumber: row.order_number,
+        customerName,
+        total: row.total,
+        status: row.status,
+        date: row.date
+      };
+    });
+
+    res.json({
+      totalRevenue,
+      totalOrders,
+      totalUsers,
+      totalProducts,
+      recentOrders
+    });
+  } catch (error) {
+    console.error('Error fetching admin dashboard:', error);
+    res.status(500).json({ error: 'Failed to fetch dashboard data' });
+  }
+});
+
 app.get('/api/admin/users', async (req, res) => {
   try {
     const result = await pool.query(`
