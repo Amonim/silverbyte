@@ -11,7 +11,7 @@ const AdminLoginPage = () => {
     e.preventDefault();
     setError("");
 
-    if (email === "admin@silverbyte.kz" && password === "admin123") {
+    if (email === "admin@mail.ru" && password === "qwerty") {
       localStorage.setItem("adminAuth", "true");
       navigate("/admin");
     } else {

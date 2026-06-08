@@ -9,7 +9,7 @@ function Header() {
   const { count } = useCart();
   const { favoritesCount } = useFavorites();
   const { user, authenticated, logoutUser } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const [query, setQuery] = useState("");

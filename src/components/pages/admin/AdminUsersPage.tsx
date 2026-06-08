@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { mockAdminUsers } from "../../../data/adminUsers";
 
 const AdminUsersPage = () => {

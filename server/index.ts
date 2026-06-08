@@ -367,6 +367,32 @@ app.patch('/api/orders/:orderId/cancel', async (req, res) => {
   }
 });
 
+app.patch('/api/admin/orders/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    const validStatuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Invalid status value' });
+    }
+
+    const result = await pool.query(
+      'UPDATE orders SET status = $1 WHERE id = $2 RETURNING *',
+      [status, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Failed to update order status:', error);
+    res.status(500).json({ error: 'Failed to update order status' });
+  }
+});
+
 app.post('/api/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;

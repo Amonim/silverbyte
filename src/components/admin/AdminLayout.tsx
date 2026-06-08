@@ -1,4 +1,4 @@
-import React from "react";
+
 import { Navigate, Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 
 const AdminLayout = () => {
