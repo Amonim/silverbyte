@@ -8,6 +8,14 @@ import { calculateProfileStats } from "../../utils/profile";
 import type { Order } from "../../types/order";
 import type { ProfileStats } from "../../types/profile";
 
+const statusMap: Record<string, string> = {
+  pending: "В обработке",
+  confirmed: "Подтверждён",
+  shipped: "Передан курьеру",
+  delivered: "Доставлен",
+  cancelled: "Отменён",
+};
+
 function ProfileSection() {
   const { user, authenticated, logoutUser } = useAuth();
   const { orders: _initialOrders, stats: _initialStats } = useProfile();
@@ -164,9 +172,9 @@ function ProfileSection() {
                       </div>
                       <div className="profile__order-footer">
                         <span className={`profile__order-status profile__order-status--${order.status}`}>
-                          {order.status === 'pending' ? 'В обработке' : order.status === 'cancelled' ? 'Отменён' : order.status}
+                          {statusMap[order.status] || order.status}
                         </span>
-                        {order.status !== 'cancelled' && (
+                        {(order.status === 'pending' || order.status === 'confirmed') && (
                           <button 
                             className="profile__button profile__button--outline"
                             style={{ marginLeft: '10px', padding: '4px 12px', fontSize: '12px' }}

@@ -1,6 +1,6 @@
 import type { CartItem } from "./cart";
 
-export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+export type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
 
 export interface OrderCustomerInfo {
   fullName: string;
