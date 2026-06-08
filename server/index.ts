@@ -18,6 +18,11 @@ app.use(express.json());
 
 async function initStorage() {
   try {
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS is_blocked BOOLEAN DEFAULT false');
+  } catch (err) {
+    console.error('Error migrating users table:', err);
+  }
+  try {
     await fs.mkdir(DATA_DIR, { recursive: true });
     try {
       await fs.access(ORDERS_FILE);
@@ -234,7 +239,12 @@ app.post('/api/orders', async (req, res) => {
 
 app.get('/api/orders', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM orders ORDER BY date DESC');
+    const result = await pool.query(`
+      SELECT o.*, u.name as "registered_user_name"
+      FROM orders o
+      LEFT JOIN users u ON o.user_email = u.email
+      ORDER BY o.date DESC
+    `);
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching orders:', error);
@@ -299,7 +309,12 @@ app.get('/api/admin/dashboard', async (req, res) => {
       pool.query("SELECT COUNT(*) as count FROM orders"),
       pool.query("SELECT COUNT(*) as count FROM users"),
       pool.query("SELECT COUNT(*) as count FROM products"),
-      pool.query("SELECT * FROM orders ORDER BY date DESC LIMIT 5")
+      pool.query(`
+        SELECT o.*, u.name as "registered_user_name" 
+        FROM orders o 
+        LEFT JOIN users u ON o.user_email = u.email 
+        ORDER BY o.date DESC LIMIT 5
+      `)
     ]);
 
     const totalRevenue = Number(revenueResult.rows[0].revenue) || 0;
@@ -315,6 +330,8 @@ app.get('/api/admin/dashboard', async (req, res) => {
           customerName = info.fullName;
         } else if (info && info.name) {
           customerName = info.name;
+        } else if (row.registered_user_name) {
+          customerName = row.registered_user_name;
         }
       } catch(e) {}
 
@@ -349,7 +366,8 @@ app.get('/api/admin/users', async (req, res) => {
         u.name, 
         u.email, 
         u.xp, 
-        u.level, 
+        u.level,
+        u.is_blocked,
         COUNT(o.id)::int as "ordersCount"
       FROM users u
       LEFT JOIN orders o ON u.email = o.user_email
@@ -360,6 +378,57 @@ app.get('/api/admin/users', async (req, res) => {
   } catch (error) {
     console.error('Error fetching admin users:', error);
     res.status(500).json({ error: 'Failed to fetch admin users' });
+  }
+});
+
+app.patch('/api/admin/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, xp, level } = req.body;
+    const result = await pool.query(
+      'UPDATE users SET name = $1, email = $2, xp = $3, level = $4 WHERE id = $5 RETURNING id, name, email, xp, level, is_blocked',
+      [name, email, xp, level, id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
+    res.json(result.rows[0]);
+  } catch(error) { 
+    console.error('Failed to update user:', error);
+    res.status(500).json({ error: 'Failed to update user' }); 
+  }
+});
+
+app.patch('/api/admin/users/:id/block', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      'UPDATE users SET is_blocked = NOT is_blocked WHERE id = $1 RETURNING id, is_blocked',
+      [id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
+    res.json(result.rows[0]);
+  } catch(error) { 
+    console.error('Failed to toggle block status:', error);
+    res.status(500).json({ error: 'Failed to toggle block status' }); 
+  }
+});
+
+app.delete('/api/admin/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userResult = await pool.query('SELECT email FROM users WHERE id = $1', [id]);
+    if (userResult.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
+    const userEmail = userResult.rows[0].email;
+
+    const orderCheck = await pool.query('SELECT id FROM orders WHERE user_email = $1 LIMIT 1', [userEmail]);
+    if (orderCheck.rows.length > 0) {
+      return res.status(400).json({ error: 'Нельзя удалить пользователя: существуют связанные заказы' });
+    }
+
+    await pool.query('DELETE FROM users WHERE id = $1', [id]);
+    res.json({ success: true });
+  } catch(error) { 
+    console.error('Failed to delete user:', error);
+    res.status(500).json({ error: 'Failed to delete user' }); 
   }
 });
 
@@ -495,9 +564,13 @@ app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    const result = await pool.query('SELECT id, name, email, xp, level FROM users WHERE email = $1 AND password = $2', [email, password]);
+    const result = await pool.query('SELECT id, name, email, xp, level, is_blocked FROM users WHERE email = $1 AND password = $2', [email, password]);
     if (result.rows.length === 0) {
       return res.status(401).json({ error: 'Неверный email или пароль' });
+    }
+
+    if (result.rows[0].is_blocked) {
+      return res.status(403).json({ error: 'Аккаунт заблокирован' });
     }
 
     res.json(result.rows[0]);

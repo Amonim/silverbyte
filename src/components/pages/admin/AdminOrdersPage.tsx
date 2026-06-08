@@ -7,6 +7,7 @@ interface Order {
   total: number;
   customer_info: string | any;
   status: string;
+  registered_user_name?: string;
 }
 
 const AdminOrdersPage = () => {
@@ -58,14 +59,16 @@ const AdminOrdersPage = () => {
     }
   };
 
-  const parseCustomerName = (info: any) => {
-    if (!info) return "Неизвестный клиент";
-    try {
-      const parsed = typeof info === "string" ? JSON.parse(info) : info;
-      return parsed.name || "Неизвестный клиент";
-    } catch (e) {
-      return "Неизвестный клиент";
+  const parseCustomerName = (info: any, registeredName?: string) => {
+    if (info) {
+      try {
+        const parsed = typeof info === "string" ? JSON.parse(info) : info;
+        if (parsed.fullName) return parsed.fullName;
+        if (parsed.name) return parsed.name;
+      } catch (e) {}
     }
+    if (registeredName) return registeredName;
+    return "Неизвестный клиент";
   };
 
   if (loading) return <div style={{ padding: "24px" }}>Загрузка заказов...</div>;
@@ -89,8 +92,8 @@ const AdminOrdersPage = () => {
           <tbody>
             {orders.map((order) => (
               <tr key={order.id}>
-                <td>{order.id}</td>
-                <td>{parseCustomerName(order.customer_info)}</td>
+                <td>{order.order_number || order.id}</td>
+                <td>{parseCustomerName(order.customer_info, order.registered_user_name)}</td>
                 <td>{order.total?.toLocaleString("ru-RU")} ₸</td>
                 <td>{new Date(order.date).toLocaleDateString("ru-RU")}</td>
                 <td>
