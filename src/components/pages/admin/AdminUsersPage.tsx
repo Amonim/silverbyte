@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getAdminUsers, updateAdminUser, blockAdminUser, deleteAdminUser, type AdminUser } from "../../../api/usersApi";
+import { calculateProfileStats } from "../../../utils/profile";
 
 const AdminUsersPage = () => {
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -120,7 +121,9 @@ const AdminUsersPage = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user) => (
+            {filteredUsers.map((user) => {
+              const stats = calculateProfileStats(Number(user.ordersCount) || 0, user.xp || 0, false);
+              return (
               <tr key={user.id} style={{ opacity: user.is_blocked ? 0.5 : 1 }}>
                 <td>
                   <div className="admin-table__user-info">
@@ -136,8 +139,8 @@ const AdminUsersPage = () => {
                   </div>
                 </td>
                 <td>{user.email || "Без email"}</td>
-                <td>{user.level || 1}</td>
-                <td>{user.xp || 0}</td>
+                <td>{stats.level}</td>
+                <td>{stats.points}</td>
                 <td>{Number(user.ordersCount) || 0}</td>
                 <td>
                   {user.is_blocked ? (
@@ -172,7 +175,8 @@ const AdminUsersPage = () => {
                   </div>
                 </td>
               </tr>
-            ))}
+              );
+            })}
             {filteredUsers.length === 0 && (
               <tr>
                 <td colSpan={7} style={{ textAlign: "center", padding: "40px", color: "var(--color-text-muted)" }}>
@@ -239,7 +243,7 @@ const AdminUsersPage = () => {
             </div>
 
             <div>
-              <label style={{ display: "block", marginBottom: "8px" }}>XP</label>
+              <label style={{ display: "block", marginBottom: "8px" }}>Базовый XP (до вычисления)</label>
               <input 
                 type="number"
                 style={{

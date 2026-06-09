@@ -60,24 +60,29 @@ export function getUserDiscount(level: number): number {
   return LEVEL_INFO[level]?.discount || 0;
 }
 
-export function calculateProfileStats(orders: Order[], backendXP?: number): ProfileStats {
-  const favoritesCount = getFavorites().length;
-  const cartCount = getCartCount();
-  const catalogOpened = localStorage.getItem(getTrackingKey("catalog_opened")) === "true";
-  const dailyVisit = localStorage.getItem(getTrackingKey("daily_visit")) === "true";
+export function calculateProfileStats(orders: Order[] | number, backendXP?: number, isLocalUser = true): ProfileStats {
+  const favoritesCount = isLocalUser ? getFavorites().length : 0;
+  const cartCount = isLocalUser ? getCartCount() : 0;
+  const catalogOpened = isLocalUser ? localStorage.getItem(getTrackingKey("catalog_opened")) === "true" : false;
+  const dailyVisit = isLocalUser ? localStorage.getItem(getTrackingKey("daily_visit")) === "true" : false;
   
   let viewedProducts = 0;
-  try {
-    const viewedStr = localStorage.getItem(getTrackingKey("viewed_products"));
-    const viewed = viewedStr ? JSON.parse(viewedStr) : [];
-    viewedProducts = Array.isArray(viewed) ? viewed.length : 0;
-  } catch (e) {
-    viewedProducts = 0;
+  if (isLocalUser) {
+    try {
+      const viewedStr = localStorage.getItem(getTrackingKey("viewed_products"));
+      const viewed = viewedStr ? JSON.parse(viewedStr) : [];
+      viewedProducts = Array.isArray(viewed) ? viewed.length : 0;
+    } catch (e) {
+      viewedProducts = 0;
+    }
   }
 
-  const orderPoints = orders
-    .filter(order => order.status !== 'cancelled')
-    .reduce((sum, order) => sum + Math.floor(order.total / 1000), 0);
+  const isOrdersArray = Array.isArray(orders);
+  const ordersLength = isOrdersArray ? orders.length : orders;
+
+  const orderPoints = isOrdersArray
+    ? orders.filter(order => order.status !== 'cancelled').reduce((sum, order) => sum + Math.floor(order.total / 1000), 0)
+    : 0; // If it's a number, backendXP already contains the order points
 
   const achievements: Achievement[] = [
     {
@@ -93,8 +98,8 @@ export function calculateProfileStats(orders: Order[], backendXP?: number): Prof
       id: "first_order",
       title: "Первый заказ",
       description: "Оформите свой первый заказ",
-      completed: orders.length >= 1,
-      progress: Math.min(orders.length, 1),
+      completed: ordersLength >= 1,
+      progress: Math.min(ordersLength, 1),
       total: 1,
       reward: 200
     },
@@ -102,8 +107,8 @@ export function calculateProfileStats(orders: Order[], backendXP?: number): Prof
       id: "buyer",
       title: "Покупатель",
       description: "Совершите 3 заказа",
-      completed: orders.length >= 3,
-      progress: Math.min(orders.length, 3),
+      completed: ordersLength >= 3,
+      progress: Math.min(ordersLength, 3),
       total: 3,
       reward: 300
     },
@@ -165,8 +170,8 @@ export function calculateProfileStats(orders: Order[], backendXP?: number): Prof
       id: "complete_order",
       title: "Завершение",
       description: "Оформите заказ",
-      completed: orders.length >= 1,
-      progress: Math.min(orders.length, 1),
+      completed: ordersLength >= 1,
+      progress: Math.min(ordersLength, 1),
       total: 1,
       reward: 100
     }
