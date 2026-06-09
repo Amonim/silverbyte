@@ -1,44 +1,15 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import fs from 'fs/promises';
-import path from 'path';
 import pool from './db';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const DATA_DIR = path.join(__dirname, 'data');
-const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
 
 app.use(cors());
 app.use(express.json());
-
-async function initStorage() {
-  try {
-    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS is_blocked BOOLEAN DEFAULT false');
-  } catch (err) {
-    console.error('Error migrating users table:', err);
-  }
-  try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    try {
-      await fs.access(ORDERS_FILE);
-    } catch {
-      await fs.writeFile(ORDERS_FILE, JSON.stringify([]));
-    }
-    try {
-      await fs.access(USERS_FILE);
-    } catch {
-      await fs.writeFile(USERS_FILE, JSON.stringify([]));
-    }
-  } catch (err) {
-    console.error('Error initializing storage:', err);
-  }
-}
-initStorage();
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
@@ -209,21 +180,6 @@ app.post('/api/orders', async (req, res) => {
         }
       } catch (dbErr) {
         console.error('Failed to update user XP in database:', dbErr);
-      }
-      
-      try {
-        const usersData = await fs.readFile(USERS_FILE, 'utf-8');
-        const users = JSON.parse(usersData);
-        const userIndex = users.findIndex((u: any) => u.email === order.userEmail);
-
-        if (userIndex !== -1) {
-          users[userIndex].xp += xp;
-        } else {
-          users.push({ email: order.userEmail, xp });
-        }
-        await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
-      } catch (userErr) {
-        console.error('Failed to update users.json:', userErr);
       }
     }
 
@@ -507,19 +463,6 @@ app.patch('/api/orders/:orderId/cancel', async (req, res) => {
         }
       } catch (dbErr) {
         console.error('Failed to update user XP in database:', dbErr);
-      }
-
-      try {
-        const usersData = await fs.readFile(USERS_FILE, 'utf-8');
-        const users = JSON.parse(usersData);
-        const userIndex = users.findIndex((u: any) => u.email === userEmail);
-
-        if (userIndex !== -1) {
-          users[userIndex].xp = Math.max(0, (users[userIndex].xp || 0) - orderXP);
-          await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
-        }
-      } catch (fileErr) {
-        console.error('Failed to update user XP in users.json:', fileErr);
       }
     }
 

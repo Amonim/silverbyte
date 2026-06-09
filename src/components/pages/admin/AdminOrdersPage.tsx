@@ -81,7 +81,7 @@ const AdminOrdersPage = () => {
 
   const handleViewOrder = async (orderId: string) => {
     setModalLoading(true);
-    setSelectedOrder({ id: orderId } as Order); // Temporary placeholder
+    setSelectedOrder({ id: orderId } as Order);
     try {
       const res = await fetch(`http://localhost:5000/api/orders/${orderId}`);
       if (!res.ok) throw new Error("Ошибка загрузки деталей заказа");
