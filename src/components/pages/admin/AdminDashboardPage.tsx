@@ -30,8 +30,23 @@ const AdminDashboardPage = () => {
     fetchDashboard();
   }, []);
 
-  if (loading) return <div style={{ padding: "24px" }}>Загрузка панели...</div>;
-  if (error) return <div style={{ padding: "24px", color: "red" }}>{error}</div>;
+  if (loading) return (
+    <div style={{ padding: "40px", textAlign: "center", color: "var(--color-text)" }}>
+      <div style={{ fontSize: "24px", marginBottom: "16px" }}>Загрузка панели...</div>
+      <div style={{ border: "4px solid var(--color-border)", borderTop: "4px solid var(--color-primary)", borderRadius: "50%", width: "40px", height: "40px", animation: "spin 1s linear infinite", margin: "0 auto" }} />
+      <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+  
+  if (error) return (
+    <div style={{ padding: "24px", textAlign: "center" }}>
+      <div style={{ display: "inline-block", background: "rgba(255,0,0,0.1)", color: "var(--color-danger)", padding: "20px 40px", borderRadius: "12px", border: "1px solid rgba(255,0,0,0.2)" }}>
+        <h3>Произошла ошибка</h3>
+        <p>{error}</p>
+        <button className="admin-btn admin-btn--primary" onClick={fetchDashboard} style={{ marginTop: "16px" }}>Повторить попытку</button>
+      </div>
+    </div>
+  );
   if (!data) return null;
 
   return (
@@ -40,14 +55,28 @@ const AdminDashboardPage = () => {
 
       <div className="admin-dashboard__grid">
         <div className="admin-card">
-          <div className="admin-card__title">💰 Общий доход</div>
+          <div className="admin-card__title">💰 Общий доход (все)</div>
           <div className="admin-card__value">
             {data.totalRevenue.toLocaleString("ru-RU")} ₸
           </div>
         </div>
         <div className="admin-card">
+          <div className="admin-card__title">✅ Доход (доставленные)</div>
+          <div className="admin-card__value" style={{ color: "var(--color-success)" }}>
+            {data.deliveredRevenue.toLocaleString("ru-RU")} ₸
+          </div>
+        </div>
+        <div className="admin-card">
           <div className="admin-card__title">🛒 Всего заказов</div>
           <div className="admin-card__value">{data.totalOrders}</div>
+        </div>
+        <div className="admin-card">
+          <div className="admin-card__title">📦 Доставленные заказы</div>
+          <div className="admin-card__value" style={{ color: "var(--color-success)" }}>{data.deliveredOrders}</div>
+        </div>
+        <div className="admin-card">
+          <div className="admin-card__title">❌ Отменённые заказы</div>
+          <div className="admin-card__value" style={{ color: "var(--color-danger)" }}>{data.cancelledOrders}</div>
         </div>
         <div className="admin-card">
           <div className="admin-card__title">👥 Всего пользователей</div>

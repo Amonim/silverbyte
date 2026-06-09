@@ -187,7 +187,10 @@ const AdminProductsPage = () => {
         </div>
 
         {isLoading ? (
-          <div style={{ padding: "40px", textAlign: "center" }}>Загрузка товаров...</div>
+          <div style={{ padding: "40px", textAlign: "center", color: "var(--color-text)" }}>
+            <div style={{ fontSize: "24px", marginBottom: "16px" }}>Загрузка товаров...</div>
+            <div style={{ border: "4px solid var(--color-border)", borderTop: "4px solid var(--color-primary)", borderRadius: "50%", width: "40px", height: "40px", animation: "spin 1s linear infinite", margin: "0 auto" }} />
+          </div>
         ) : (
           <table className="admin-table">
             <thead>
@@ -235,7 +238,10 @@ const AdminProductsPage = () => {
               ))}
               {filteredProducts.length === 0 && (
                 <tr>
-                  <td colSpan={4} style={{ textAlign: "center", padding: "20px" }}>Товары не найдены</td>
+                  <td colSpan={4} style={{ textAlign: "center", padding: "40px", color: "var(--color-text-muted)" }}>
+                    <h3>Товары не найдены</h3>
+                    <p>Измените параметры поиска или добавьте новый товар.</p>
+                  </td>
                 </tr>
               )}
             </tbody>

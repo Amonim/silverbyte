@@ -67,8 +67,23 @@ const AdminUsersPage = () => {
     (u.email || "").toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading) return <div style={{ padding: "24px" }}>Загрузка пользователей...</div>;
-  if (error) return <div style={{ padding: "24px", color: "red" }}>{error}</div>;
+  if (loading) return (
+    <div style={{ padding: "40px", textAlign: "center", color: "var(--color-text)" }}>
+      <div style={{ fontSize: "24px", marginBottom: "16px" }}>Загрузка пользователей...</div>
+      <div style={{ border: "4px solid var(--color-border)", borderTop: "4px solid var(--color-primary)", borderRadius: "50%", width: "40px", height: "40px", animation: "spin 1s linear infinite", margin: "0 auto" }} />
+      <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+  
+  if (error) return (
+    <div style={{ padding: "24px", textAlign: "center" }}>
+      <div style={{ display: "inline-block", background: "rgba(255,0,0,0.1)", color: "var(--color-danger)", padding: "20px 40px", borderRadius: "12px", border: "1px solid rgba(255,0,0,0.2)" }}>
+        <h3>Произошла ошибка</h3>
+        <p>{error}</p>
+        <button className="admin-btn admin-btn--primary" onClick={fetchUsers} style={{ marginTop: "16px" }}>Повторить попытку</button>
+      </div>
+    </div>
+  );
 
   return (
     <div>
@@ -100,6 +115,7 @@ const AdminUsersPage = () => {
               <th>Уровень</th>
               <th>XP</th>
               <th>Заказы</th>
+              <th>Статус</th>
               <th>Действия</th>
             </tr>
           </thead>
@@ -123,6 +139,13 @@ const AdminUsersPage = () => {
                 <td>{user.level || 1}</td>
                 <td>{user.xp || 0}</td>
                 <td>{Number(user.ordersCount) || 0}</td>
+                <td>
+                  {user.is_blocked ? (
+                    <span style={{ background: "rgba(255,0,0,0.1)", color: "var(--color-danger)", padding: "4px 8px", borderRadius: "4px", fontSize: "12px", fontWeight: "bold" }}>Заблокирован</span>
+                  ) : (
+                    <span style={{ background: "rgba(0,128,0,0.1)", color: "var(--color-success)", padding: "4px 8px", borderRadius: "4px", fontSize: "12px", fontWeight: "bold" }}>Активен</span>
+                  )}
+                </td>
                 <td>
                   <div className="admin-table__actions">
                     <button
@@ -150,6 +173,14 @@ const AdminUsersPage = () => {
                 </td>
               </tr>
             ))}
+            {filteredUsers.length === 0 && (
+              <tr>
+                <td colSpan={7} style={{ textAlign: "center", padding: "40px", color: "var(--color-text-muted)" }}>
+                  <h3>Пользователи не найдены</h3>
+                  <p>По вашему запросу нет результатов.</p>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

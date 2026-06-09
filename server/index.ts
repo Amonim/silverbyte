@@ -240,7 +240,7 @@ app.post('/api/orders', async (req, res) => {
 app.get('/api/orders', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT o.*, u.name as "registered_user_name"
+      SELECT o.*, u.name as "registered_user_name", u.email as "registered_user_email"
       FROM orders o
       LEFT JOIN users u ON o.user_email = u.email
       ORDER BY o.date DESC
@@ -269,7 +269,12 @@ app.get('/api/orders/:id', async (req, res) => {
       return res.json(orders);
     }
 
-    const orderResult = await pool.query('SELECT * FROM orders WHERE id = $1', [id]);
+    const orderResult = await pool.query(`
+      SELECT o.*, u.name as "registered_user_name", u.email as "registered_user_email" 
+      FROM orders o 
+      LEFT JOIN users u ON o.user_email = u.email 
+      WHERE o.id = $1
+    `, [id]);
     
     if (orderResult.rows.length === 0) {
       return res.status(404).json({ error: 'Order not found' });
@@ -303,7 +308,10 @@ app.get('/api/admin/dashboard', async (req, res) => {
       ordersCountResult,
       usersCountResult,
       productsCountResult,
-      recentOrdersResult
+      recentOrdersResult,
+      cancelledCountResult,
+      deliveredCountResult,
+      deliveredRevenueResult
     ] = await Promise.all([
       pool.query("SELECT SUM(total) as revenue FROM orders WHERE status IN ('confirmed', 'shipped', 'delivered')"),
       pool.query("SELECT COUNT(*) as count FROM orders"),
@@ -314,13 +322,19 @@ app.get('/api/admin/dashboard', async (req, res) => {
         FROM orders o 
         LEFT JOIN users u ON o.user_email = u.email 
         ORDER BY o.date DESC LIMIT 5
-      `)
+      `),
+      pool.query("SELECT COUNT(*) as count FROM orders WHERE status = 'cancelled'"),
+      pool.query("SELECT COUNT(*) as count FROM orders WHERE status = 'delivered'"),
+      pool.query("SELECT SUM(total) as revenue FROM orders WHERE status = 'delivered'")
     ]);
 
     const totalRevenue = Number(revenueResult.rows[0].revenue) || 0;
     const totalOrders = Number(ordersCountResult.rows[0].count) || 0;
     const totalUsers = Number(usersCountResult.rows[0].count) || 0;
     const totalProducts = Number(productsCountResult.rows[0].count) || 0;
+    const cancelledOrders = Number(cancelledCountResult.rows[0].count) || 0;
+    const deliveredOrders = Number(deliveredCountResult.rows[0].count) || 0;
+    const deliveredRevenue = Number(deliveredRevenueResult.rows[0].revenue) || 0;
     
     const recentOrders = recentOrdersResult.rows.map(row => {
       let customerName = "Неизвестный клиент";
@@ -350,6 +364,9 @@ app.get('/api/admin/dashboard', async (req, res) => {
       totalOrders,
       totalUsers,
       totalProducts,
+      cancelledOrders,
+      deliveredOrders,
+      deliveredRevenue,
       recentOrders
     });
   } catch (error) {
