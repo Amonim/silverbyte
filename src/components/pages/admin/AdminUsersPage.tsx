@@ -53,8 +53,7 @@ const AdminUsersPage = () => {
       const updated = await updateAdminUser(editingUser.id, {
         name: editingUser.name,
         email: editingUser.email,
-        xp: editingUser.xp,
-        level: editingUser.level
+        xp: editingUser.xp
       });
       setUsers(prev => prev.map(u => u.id === updated.id ? { ...u, ...updated } : u));
       setEditingUser(null);
@@ -229,20 +228,6 @@ const AdminUsersPage = () => {
             </div>
 
             <div>
-              <label style={{ display: "block", marginBottom: "8px" }}>Уровень</label>
-              <input 
-                type="number"
-                style={{
-                  width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid var(--color-border)",
-                  background: "var(--color-bg)", color: "var(--color-text)", fontSize: "14px", boxSizing: "border-box"
-                }}
-                value={editingUser.level}
-                onChange={e => setEditingUser({...editingUser, level: Number(e.target.value)})}
-                required
-              />
-            </div>
-
-            <div>
               <label style={{ display: "block", marginBottom: "8px" }}>Базовый XP (до вычисления)</label>
               <input 
                 type="number"
@@ -254,13 +239,16 @@ const AdminUsersPage = () => {
                 onChange={e => setEditingUser({...editingUser, xp: Number(e.target.value)})}
                 required
               />
+              <p style={{ fontSize: "12px", color: "var(--color-text-muted)", marginTop: "6px" }}>
+                Итоговый уровень рассчитывается автоматически на основе XP и заказов.
+              </p>
             </div>
 
             <div style={{ display: "flex", gap: "12px", marginTop: "16px" }}>
-              <button type="submit" className="admin-btn admin-btn--primary" style={{ flex: 1 }}>
+              <button type="submit" className="admin-btn admin-btn--primary" style={{ flex: 1, padding: "10px", borderRadius: "6px" }}>
                 Сохранить
               </button>
-              <button type="button" className="admin-btn" style={{ flex: 1, border: "1px solid var(--color-border)" }} onClick={() => setEditingUser(null)}>
+              <button type="button" className="admin-btn" style={{ flex: 1, padding: "10px", borderRadius: "6px", background: "transparent", color: "var(--color-text)", border: "1px solid var(--color-border)" }} onClick={() => setEditingUser(null)}>
                 Отмена
               </button>
             </div>

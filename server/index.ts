@@ -359,7 +359,7 @@ app.patch('/api/admin/users/:id', async (req, res) => {
     const { id } = req.params;
     const { name, email, xp, level } = req.body;
     const result = await pool.query(
-      'UPDATE users SET name = $1, email = $2, xp = $3, level = $4 WHERE id = $5 RETURNING id, name, email, xp, level, is_blocked',
+      'UPDATE users SET name = $1, email = $2, xp = $3, level = COALESCE($4, level) WHERE id = $5 RETURNING id, name, email, xp, level, is_blocked',
       [name, email, xp, level, id]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
