@@ -4,32 +4,18 @@ import useCart from "../../hooks/useCart";
 import useAuth from "../../hooks/useAuth";
 import useProfile from "../../hooks/useProfile";
 import { createOrderNumber } from "../../utils/orders";
-import { createOrder, getUserXP } from "../../api/ordersApi";
-import { calculateProfileStats } from "../../utils/profile";
+import { createOrder } from "../../api/ordersApi";
 import type { OrderCustomerInfo } from "../../types/order";
-import type { ProfileStats } from "../../types/profile";
-import { useEffect } from "react";
 
 function CheckoutSection() {
   const { items, total, clearCart } = useCart();
   const { user, authenticated } = useAuth();
-  useProfile(); // just call it if we need the effect, otherwise let's just leave it out if we don't need `stats`
-  // Actually, wait, useProfile provides the initial loading of profile data. Let's just destructure nothing.
+  const { stats: backendStats } = useProfile();
   
   const [successOrder, setSuccessOrder] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [backendStats, setBackendStats] = useState<ProfileStats | null>(null);
-
-  useEffect(() => {
-    if (user?.email) {
-      getUserXP(user.email).then(xp => {
-        const stats = calculateProfileStats([], xp);
-        setBackendStats(stats);
-      });
-    }
-  }, [user]);
 
   const discountPercent = backendStats?.discount || 0;
   const discountAmount = Math.round((total * discountPercent) / 100);

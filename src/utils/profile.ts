@@ -46,11 +46,19 @@ export const markProductViewed = (productId: number) => {
 
 export const LEVEL_INFO: Record<number, { prefix: string, discount: number }> = {
   1: { prefix: "Новичок", discount: 0 },
-  2: { prefix: "Покупатель", discount: 2 },
-  3: { prefix: "Активный", discount: 3 },
-  4: { prefix: "Коллекционер", discount: 5 },
-  5: { prefix: "VIP", discount: 7 }
+  2: { prefix: "Активный", discount: 3 },
+  3: { prefix: "Покупатель", discount: 5 },
+  4: { prefix: "Коллекционер", discount: 7 },
+  5: { prefix: "VIP", discount: 10 }
 };
+
+export function getUserRank(level: number): string {
+  return LEVEL_INFO[level]?.prefix || "Новичок";
+}
+
+export function getUserDiscount(level: number): number {
+  return LEVEL_INFO[level]?.discount || 0;
+}
 
 export function calculateProfileStats(orders: Order[], backendXP?: number): ProfileStats {
   const favoritesCount = getFavorites().length;
@@ -196,8 +204,8 @@ export function calculateProfileStats(orders: Order[], backendXP?: number): Prof
     nextLevelPoints = points;
   }
 
-  const prefix = LEVEL_INFO[level]?.prefix || "Новичок";
-  const discount = LEVEL_INFO[level]?.discount || 0;
+  const prefix = getUserRank(level);
+  const discount = getUserDiscount(level);
 
   return {
     points,

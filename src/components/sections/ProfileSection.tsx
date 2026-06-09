@@ -1,12 +1,7 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import useProfile from "../../hooks/useProfile";
-import { getUserOrders, getUserXP, cancelOrder } from "../../api/ordersApi";
-import { calculateProfileStats } from "../../utils/profile";
-
-import type { Order } from "../../types/order";
-import type { ProfileStats } from "../../types/profile";
+import { cancelOrder } from "../../api/ordersApi";
 
 const statusMap: Record<string, string> = {
   pending: "В обработке",
@@ -18,38 +13,12 @@ const statusMap: Record<string, string> = {
 
 function ProfileSection() {
   const { user, authenticated, logoutUser } = useAuth();
-  const { orders: _initialOrders, stats: _initialStats } = useProfile();
-
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [stats, setStats] = useState<ProfileStats | null>(null);
-
-  const loadProfileData = async () => {
-    if (user?.email) {
-      try {
-        const [apiOrders, backendXP] = await Promise.all([
-          getUserOrders(user.email),
-          getUserXP(user.email)
-        ]);
-        
-        setOrders(apiOrders);
-        const newStats = calculateProfileStats(apiOrders, backendXP);
-        setStats(newStats);
-      } catch (err) {
-        console.error("Failed to load profile data:", err);
-      }
-    }
-  };
-
-  useEffect(() => {
-    loadProfileData();
-    window.addEventListener("profile-updated", loadProfileData);
-    return () => window.removeEventListener("profile-updated", loadProfileData);
-  }, [user]);
+  const { orders, stats, refreshProfile } = useProfile();
 
   const handleCancelClick = async (orderId: string) => {
     if (user) {
       await cancelOrder(orderId, user.email);
-      loadProfileData();
+      refreshProfile();
     }
   };
 

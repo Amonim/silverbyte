@@ -58,7 +58,7 @@ app.post('/api/products', async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
     
-    // We pass specs as JSON string, and images as JSON string (or array if node-postgres supports it, let's pass stringified JSON)
+
     const result = await pool.query(
       `INSERT INTO products (title, category, price, images, description, specs) 
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
@@ -134,7 +134,7 @@ app.post('/api/orders', async (req, res) => {
 
     await client.query('BEGIN');
 
-    // 1. Check products
+
     for (const item of order.items) {
       const productCheck = await client.query('SELECT id FROM products WHERE id = $1', [item.id]);
       if (productCheck.rows.length === 0) {
@@ -142,7 +142,7 @@ app.post('/api/orders', async (req, res) => {
       }
     }
 
-    // 2. Insert order
+
     await client.query(
       `INSERT INTO orders 
        (id, order_number, date, subtotal, discount_percent, discount_amount, total, customer_info, payment_method, status, user_prefix, user_email, xp)
@@ -155,7 +155,7 @@ app.post('/api/orders', async (req, res) => {
       ]
     );
 
-    // 3. Insert order items
+
     for (const item of order.items) {
       await client.query(
         `INSERT INTO order_items (order_id, product_id, quantity, price_at_purchase)
@@ -166,7 +166,7 @@ app.post('/api/orders', async (req, res) => {
 
     await client.query('COMMIT');
 
-    // Update Postgres users table
+
     if (order.userEmail) {
       try {
         const userCheck = await client.query('SELECT xp FROM users WHERE email = $1', [order.userEmail]);
@@ -212,10 +212,10 @@ app.get('/api/orders/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
-    // UUID format check (simple regex to avoid crashing if id is a userEmail from old endpoints)
+
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(id)) {
-      // Fallback to fetch by userEmail for compatibility if needed
+
       const result = await pool.query('SELECT * FROM orders WHERE user_email = $1 ORDER BY date DESC', [id]);
       const orders = result.rows;
       for (let order of orders) {
@@ -409,7 +409,7 @@ app.get('/api/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Support fetching by email for backward compatibility with old endpoints
+
     let result;
     if (id.includes('@')) {
       result = await pool.query('SELECT id, name, email, xp, level FROM users WHERE email = $1', [id]);
@@ -420,7 +420,7 @@ app.get('/api/users/:id', async (req, res) => {
     if (result.rows.length > 0) {
       res.json(result.rows[0]);
     } else {
-      // Fallback for guest users
+
       res.json({ email: id.includes('@') ? id : '', xp: 0, level: 1 });
     }
   } catch (error) {

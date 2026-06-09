@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getOrders } from "../utils/orders";
+import { getUserOrders, getUserXP } from "../api/ordersApi";
 import { calculateProfileStats } from "../utils/profile";
 import type { Order } from "../types/order";
 import type { ProfileStats } from "../types/profile";
@@ -10,18 +10,25 @@ export default function useProfile() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState<ProfileStats | null>(null);
 
-  useEffect(() => {
-    const updateProfileData = () => {
-      if (authenticated && user) {
-        const userOrders = getOrders(user.email);
-        setOrders(userOrders);
-        setStats(calculateProfileStats(userOrders));
-      } else {
-        setOrders([]);
-        setStats(null);
+  const updateProfileData = async () => {
+    if (authenticated && user?.email) {
+      try {
+        const [apiOrders, backendXP] = await Promise.all([
+          getUserOrders(user.email),
+          getUserXP(user.email)
+        ]);
+        setOrders(apiOrders);
+        setStats(calculateProfileStats(apiOrders, backendXP));
+      } catch (err) {
+        console.error("Failed to fetch profile data:", err);
       }
-    };
+    } else {
+      setOrders([]);
+      setStats(null);
+    }
+  };
 
+  useEffect(() => {
     updateProfileData();
 
     window.addEventListener("orders-updated", updateProfileData);
@@ -37,5 +44,5 @@ export default function useProfile() {
     };
   }, [authenticated, user]);
 
-  return { orders, stats };
+  return { orders, stats, refreshProfile: updateProfileData };
 }
