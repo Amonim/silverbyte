@@ -8,14 +8,12 @@ const AdminProductsPage = () => {
   const [category, setCategory] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState("");
   const [appError, setAppError] = useState("");
 
-  // Form states
   const [formData, setFormData] = useState({
     title: "",
     category: "smartphones" as Product["category"],
@@ -84,8 +82,6 @@ const AdminProductsPage = () => {
 
   const handleDelete = async (id: number) => {
     setAppError("");
-    // Use custom modal logic or just directly call since we shouldn't use prompt/confirm. 
-    // Wait, the prompt says "Не используй alert/prompt/confirm", so we can just do it directly.
     try {
       await deleteProduct(id);
       loadProducts();
