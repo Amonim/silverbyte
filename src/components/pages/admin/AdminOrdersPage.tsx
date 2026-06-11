@@ -50,10 +50,12 @@ const AdminOrdersPage = () => {
   const handleStatusChange = async (id: string, newStatus: string) => {
     try {
       setActionError("");
+      const token = localStorage.getItem("adminToken");
       const res = await fetch(`http://localhost:5000/api/admin/orders/${id}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ status: newStatus }),
       });

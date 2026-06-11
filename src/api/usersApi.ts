@@ -11,7 +11,10 @@ export interface AdminUser {
 }
 
 export const getAdminUsers = async (): Promise<AdminUser[]> => {
-  const response = await fetch('http://localhost:5000/api/admin/users');
+  const token = localStorage.getItem('adminToken');
+  const response = await fetch('http://localhost:5000/api/admin/users', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
   if (!response.ok) {
     throw new Error('Failed to fetch admin users');
   }
@@ -19,9 +22,13 @@ export const getAdminUsers = async (): Promise<AdminUser[]> => {
 };
 
 export const updateAdminUser = async (id: string | number, data: Partial<AdminUser>): Promise<AdminUser> => {
+  const token = localStorage.getItem('adminToken');
   const response = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
     body: JSON.stringify(data)
   });
   if (!response.ok) {
@@ -32,8 +39,10 @@ export const updateAdminUser = async (id: string | number, data: Partial<AdminUs
 };
 
 export const blockAdminUser = async (id: string | number): Promise<AdminUser> => {
+  const token = localStorage.getItem('adminToken');
   const response = await fetch(`http://localhost:5000/api/admin/users/${id}/block`, {
-    method: 'PATCH'
+    method: 'PATCH',
+    headers: { 'Authorization': `Bearer ${token}` }
   });
   if (!response.ok) {
     const error = await response.json();
@@ -43,8 +52,10 @@ export const blockAdminUser = async (id: string | number): Promise<AdminUser> =>
 };
 
 export const deleteAdminUser = async (id: string | number): Promise<void> => {
+  const token = localStorage.getItem('adminToken');
   const response = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` }
   });
   if (!response.ok) {
     const error = await response.json();

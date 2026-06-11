@@ -19,7 +19,12 @@ export interface DashboardData {
 }
 
 export const getDashboardData = async (): Promise<DashboardData> => {
-  const response = await fetch('http://localhost:5000/api/admin/dashboard');
+  const token = localStorage.getItem('adminToken');
+  const response = await fetch('http://localhost:5000/api/admin/dashboard', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
   if (!response.ok) {
     throw new Error('Failed to fetch dashboard data');
   }

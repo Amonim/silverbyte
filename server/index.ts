@@ -2,14 +2,41 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import pool from './db';
+import bcrypt from 'bcrypt';
 
 dotenv.config();
+
+const ADMIN_EMAIL = "admin@mail.ru";
+const ADMIN_PASSWORD = "qwerty";
+const ADMIN_TOKEN = "admin-token";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+const requireAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || authHeader !== `Bearer ${ADMIN_TOKEN}`) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+};
+
+app.post('/api/admin/login', (req, res) => {
+  const { email, password } = req.body;
+  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    return res.json({
+      success: true,
+      token: ADMIN_TOKEN,
+      admin: { email: ADMIN_EMAIL, role: 'admin' }
+    });
+  }
+  return res.status(401).json({ success: false, message: 'Неверный email или пароль' });
+});
+
+app.use('/api/admin', requireAdmin);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
@@ -508,9 +535,11 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ error: 'Пользователь с таким email уже существует' });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const result = await pool.query(
       'INSERT INTO users (name, email, password, xp, level) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, xp, level',
-      [name, email, password, 0, 1]
+      [name, email, hashedPassword, 0, 1]
     );
 
     res.status(201).json(result.rows[0]);
@@ -524,16 +553,23 @@ app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    const result = await pool.query('SELECT id, name, email, xp, level, is_blocked FROM users WHERE email = $1 AND password = $2', [email, password]);
+    const result = await pool.query('SELECT id, name, email, xp, level, is_blocked, password FROM users WHERE email = $1', [email]);
     if (result.rows.length === 0) {
       return res.status(401).json({ error: 'Неверный email или пароль' });
     }
 
-    if (result.rows[0].is_blocked) {
+    const user = result.rows[0];
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Неверный email или пароль' });
+    }
+
+    if (user.is_blocked) {
       return res.status(403).json({ error: 'Аккаунт заблокирован' });
     }
 
-    res.json(result.rows[0]);
+    delete user.password;
+    res.json(user);
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Failed to login' });

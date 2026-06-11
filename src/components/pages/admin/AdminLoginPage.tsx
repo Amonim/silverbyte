@@ -7,15 +7,28 @@ const AdminLoginPage = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (email === "admin@mail.ru" && password === "qwerty") {
-      localStorage.setItem("adminAuth", "true");
-      navigate("/admin");
-    } else {
-      setError("Неверный email или пароль");
+    try {
+      const response = await fetch("http://localhost:5000/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem("adminToken", data.token);
+        localStorage.setItem("adminAuth", "true");
+        navigate("/admin");
+      } else {
+        setError(data.message || "Неверный email или пароль");
+      }
+    } catch (err) {
+      setError("Ошибка соединения с сервером");
     }
   };
 
