@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { getAdminUsers, updateAdminUser, blockAdminUser, deleteAdminUser, type AdminUser } from "../../../api/usersApi";
-import { calculateProfileStats } from "../../../utils/profile";
 
 const AdminUsersPage = () => {
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -121,7 +120,6 @@ const AdminUsersPage = () => {
           </thead>
           <tbody>
             {filteredUsers.map((user) => {
-              const stats = calculateProfileStats(Number(user.ordersCount) || 0, user.xp || 0, false);
               return (
               <tr key={user.id} style={{ opacity: user.is_blocked ? 0.5 : 1 }}>
                 <td>
@@ -138,8 +136,8 @@ const AdminUsersPage = () => {
                   </div>
                 </td>
                 <td>{user.email || "Без email"}</td>
-                <td>{stats.level}</td>
-                <td>{stats.points}</td>
+                <td>{user.level || 1}</td>
+                <td>{user.xp || 0}</td>
                 <td>{Number(user.ordersCount) || 0}</td>
                 <td>
                   {user.is_blocked ? (
@@ -228,7 +226,7 @@ const AdminUsersPage = () => {
             </div>
 
             <div>
-              <label style={{ display: "block", marginBottom: "8px" }}>Базовый XP (до вычисления)</label>
+              <label style={{ display: "block", marginBottom: "8px" }}>XP пользователя</label>
               <input 
                 type="number"
                 style={{
@@ -239,9 +237,6 @@ const AdminUsersPage = () => {
                 onChange={e => setEditingUser({...editingUser, xp: Number(e.target.value)})}
                 required
               />
-              <p style={{ fontSize: "12px", color: "var(--color-text-muted)", marginTop: "6px" }}>
-                Итоговый уровень рассчитывается автоматически на основе XP и заказов.
-              </p>
             </div>
 
             <div style={{ display: "flex", gap: "12px", marginTop: "16px" }}>

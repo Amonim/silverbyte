@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getUserOrders, getUserXP } from "../api/ordersApi";
+import { getUserAchievements, unlockAchievement } from "../api/usersApi";
 import { calculateProfileStats } from "../utils/profile";
 import type { Order } from "../types/order";
 import type { ProfileStats } from "../types/profile";
@@ -13,18 +14,45 @@ export default function useProfile() {
   const updateProfileData = async () => {
     if (authenticated && user?.email) {
       try {
-        const [apiOrders, backendXP] = await Promise.all([
+        const [apiOrders, backendXP, unlockedAchievements] = await Promise.all([
           getUserOrders(user.email),
-          getUserXP(user.email)
+          getUserXP(user.email),
+          getUserAchievements(user.email)
         ]);
+        
         setOrders(apiOrders);
-        setStats(calculateProfileStats(apiOrders, backendXP));
+        
+        const newStats = calculateProfileStats(apiOrders, backendXP, true, unlockedAchievements);
+        setStats(newStats);
+
+        // Check if any achievement was newly completed locally
+        const newlyCompleted = newStats.achievements.filter(ach => ach.completed && !unlockedAchievements.includes(ach.id));
+        if (newlyCompleted.length > 0) {
+          // Exclude passive achievements like 'purchases_passive' from sending POST requests since they are handled dynamically
+          const toUnlock = newlyCompleted.filter(ach => ach.id !== "purchases_passive");
+          if (toUnlock.length > 0) {
+            let unlockedAny = false;
+            for (const ach of toUnlock) {
+              const success = await unlockAchievement(user.email, ach.id, ach.reward);
+              if (success) unlockedAny = true;
+            }
+            if (unlockedAny) {
+              // Refetch to get updated XP, level, and achievements list from backend
+              const [newOrders, newBackendXP, newUnlocked] = await Promise.all([
+                getUserOrders(user.email),
+                getUserXP(user.email),
+                getUserAchievements(user.email)
+              ]);
+              setStats(calculateProfileStats(newOrders, newBackendXP, true, newUnlocked));
+            }
+          }
+        }
       } catch (err) {
         console.error("Failed to fetch profile data:", err);
       }
     } else {
       setOrders([]);
-      setStats(null);
+      setStats(calculateProfileStats([], undefined, true, []));
     }
   };
 

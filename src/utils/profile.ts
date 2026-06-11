@@ -60,7 +60,12 @@ export function getUserDiscount(level: number): number {
   return LEVEL_INFO[level]?.discount || 0;
 }
 
-export function calculateProfileStats(orders: Order[] | number, backendXP?: number, isLocalUser = true): ProfileStats {
+export function calculateProfileStats(
+  orders: Order[] | number, 
+  backendXP?: number, 
+  isLocalUser = true,
+  unlockedAchievements: string[] = []
+): ProfileStats {
   const favoritesCount = isLocalUser ? getFavorites().length : 0;
   const cartCount = isLocalUser ? getCartCount() : 0;
   const catalogOpened = isLocalUser ? localStorage.getItem(getTrackingKey("catalog_opened")) === "true" : false;
@@ -177,11 +182,22 @@ export function calculateProfileStats(orders: Order[] | number, backendXP?: numb
     }
   ];
 
+  achievements.forEach(ach => {
+    if (unlockedAchievements.includes(ach.id)) {
+      ach.completed = true;
+      ach.progress = ach.total;
+    }
+  });
+
   let points = typeof backendXP === 'number' ? backendXP : 100 + orderPoints;
 
-  achievements.forEach(ach => {
-    if (ach.completed) points += ach.reward;
-  });
+  // Only add achievement rewards to points dynamically if we're a guest (no backendXP). 
+  // Registered users have their achievement rewards permanently saved in backendXP.
+  if (typeof backendXP !== 'number') {
+    achievements.forEach(ach => {
+      if (ach.completed) points += ach.reward;
+    });
+  }
 
 
   let level = 1;

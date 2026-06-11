@@ -62,3 +62,25 @@ export const deleteAdminUser = async (id: string | number): Promise<void> => {
     throw new Error(error.error || 'Failed to delete user');
   }
 };
+
+export const getUserAchievements = async (email: string): Promise<string[]> => {
+  const response = await fetch(`http://localhost:5000/api/users/${email}/achievements`);
+  if (!response.ok) {
+    console.error('Failed to fetch achievements');
+    return [];
+  }
+  return response.json();
+};
+
+export const unlockAchievement = async (email: string, achievementKey: string, reward: number): Promise<boolean> => {
+  const response = await fetch(`http://localhost:5000/api/users/${email}/achievements`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ achievement_key: achievementKey, reward })
+  });
+  if (!response.ok) {
+    return false;
+  }
+  const data = await response.json();
+  return data.success;
+};

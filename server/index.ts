@@ -384,10 +384,17 @@ app.get('/api/admin/users', async (req, res) => {
 app.patch('/api/admin/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, xp, level } = req.body;
+    const { name, email, xp } = req.body;
+    
+    // Recalculate level
+    let newLevel = 1;
+    const LEVELS = [0, 300, 700, 1500, 3000];
+    for (let i = 0; i < LEVELS.length; i++) if (xp >= LEVELS[i]) newLevel = i + 1;
+    if (newLevel > 5) newLevel = 5;
+
     const result = await pool.query(
-      'UPDATE users SET name = $1, email = $2, xp = $3, level = COALESCE($4, level) WHERE id = $5 RETURNING id, name, email, xp, level, is_blocked',
-      [name, email, xp, level, id]
+      'UPDATE users SET name = $1, email = $2, xp = $3, level = $4 WHERE id = $5 RETURNING id, name, email, xp, level, is_blocked',
+      [name, email, xp, newLevel, id]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
     res.json(result.rows[0]);
@@ -447,12 +454,65 @@ app.get('/api/users/:id', async (req, res) => {
     if (result.rows.length > 0) {
       res.json(result.rows[0]);
     } else {
-
-      res.json({ email: id.includes('@') ? id : '', xp: 0, level: 1 });
+      res.status(404).json({ error: 'User not found' });
     }
   } catch (error) {
     console.error('Error fetching user:', error);
     res.status(500).json({ error: 'Failed to fetch user' });
+  }
+});
+
+app.get('/api/users/:email/achievements', async (req, res) => {
+  try {
+    const { email } = req.params;
+    const userRes = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    if (userRes.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+    
+    const result = await pool.query('SELECT achievement_key FROM user_achievements WHERE user_id = $1', [userRes.rows[0].id]);
+    res.json(result.rows.map(row => row.achievement_key));
+  } catch (error) {
+    console.error('Failed to fetch achievements:', error);
+    res.status(500).json({ error: 'Failed to fetch achievements' });
+  }
+});
+
+app.post('/api/users/:email/achievements', async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { email } = req.params;
+    const { achievement_key, reward } = req.body;
+    
+    await client.query('BEGIN');
+    const userRes = await client.query('SELECT id, xp FROM users WHERE email = $1 FOR UPDATE', [email]);
+    if (userRes.rows.length === 0) throw new Error('User not found');
+    
+    const userId = userRes.rows[0].id;
+    let currentXp = userRes.rows[0].xp;
+    
+    // Check if already unlocked
+    const checkRes = await client.query('SELECT id FROM user_achievements WHERE user_id = $1 AND achievement_key = $2', [userId, achievement_key]);
+    if (checkRes.rows.length === 0) {
+      await client.query('INSERT INTO user_achievements (user_id, achievement_key) VALUES ($1, $2)', [userId, achievement_key]);
+      
+      const newXp = currentXp + (Number(reward) || 0);
+      let newLevel = 1;
+      const LEVELS = [0, 300, 700, 1500, 3000];
+      for (let i = 0; i < LEVELS.length; i++) if (newXp >= LEVELS[i]) newLevel = i + 1;
+      if (newLevel > 5) newLevel = 5;
+      
+      await client.query('UPDATE users SET xp = $1, level = $2 WHERE id = $3', [newXp, newLevel, userId]);
+      await client.query('COMMIT');
+      res.json({ success: true, xp: newXp, level: newLevel });
+    } else {
+      await client.query('COMMIT');
+      res.json({ success: false, message: 'Already unlocked' });
+    }
+  } catch (error: any) {
+    await client.query('ROLLBACK');
+    console.error('Failed to unlock achievement:', error);
+    res.status(500).json({ error: 'Failed to unlock achievement' });
+  } finally {
+    client.release();
   }
 });
 
