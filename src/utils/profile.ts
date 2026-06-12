@@ -87,7 +87,7 @@ export function calculateProfileStats(
 
   const orderPoints = isOrdersArray
     ? orders.filter(order => order.status !== 'cancelled').reduce((sum, order) => sum + Math.floor(order.total / 1000), 0)
-    : 0; // If it's a number, backendXP already contains the order points
+    : 0;
 
   const achievements: Achievement[] = [
     {
@@ -191,8 +191,6 @@ export function calculateProfileStats(
 
   let points = typeof backendXP === 'number' ? backendXP : 100 + orderPoints;
 
-  // Only add achievement rewards to points dynamically if we're a guest (no backendXP). 
-  // Registered users have their achievement rewards permanently saved in backendXP.
   if (typeof backendXP !== 'number') {
     achievements.forEach(ach => {
       if (ach.completed) points += ach.reward;

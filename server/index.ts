@@ -16,6 +16,35 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+const checkUserStatus = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (req.path.startsWith('/api/admin')) {
+    return next();
+  }
+
+  let email = req.headers['x-user-email'] as string;
+  if (!email) {
+    if (req.body && req.body.userEmail) email = req.body.userEmail;
+    else if (req.params && req.params.email) email = req.params.email;
+    else if (req.params && req.params.id && req.params.id.includes('@')) email = req.params.id;
+  }
+
+  if (email) {
+    try {
+      const result = await pool.query('SELECT is_blocked FROM users WHERE email = $1', [email]);
+      if (result.rows.length === 0) {
+        return res.status(401).json({ error: 'Пользователь не найден' });
+      }
+      if (result.rows[0].is_blocked) {
+        return res.status(403).json({ error: 'Аккаунт заблокирован' });
+      }
+    } catch (error) {
+      console.error('Error checking user status:', error);
+    }
+  }
+  
+  next();
+};
+
 const requireAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || authHeader !== `Bearer ${ADMIN_TOKEN}`) {
@@ -151,7 +180,7 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
-app.post('/api/orders', async (req, res) => {
+app.post('/api/orders', checkUserStatus, async (req, res) => {
   const client = await pool.connect();
   try {
     const order = req.body;
@@ -220,7 +249,7 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
-app.get('/api/orders', async (req, res) => {
+app.get('/api/orders', checkUserStatus, async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT o.*, u.name as "registered_user_name", u.email as "registered_user_email"
@@ -235,7 +264,7 @@ app.get('/api/orders', async (req, res) => {
   }
 });
 
-app.get('/api/orders/:id', async (req, res) => {
+app.get('/api/orders/:id', checkUserStatus, async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -386,7 +415,6 @@ app.patch('/api/admin/users/:id', async (req, res) => {
     const { id } = req.params;
     const { name, email, xp } = req.body;
     
-    // Recalculate level
     let newLevel = 1;
     const LEVELS = [0, 300, 700, 1500, 3000];
     for (let i = 0; i < LEVELS.length; i++) if (xp >= LEVELS[i]) newLevel = i + 1;
@@ -439,7 +467,7 @@ app.delete('/api/admin/users/:id', async (req, res) => {
   }
 });
 
-app.get('/api/users/:id', async (req, res) => {
+app.get('/api/users/:id', checkUserStatus, async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -462,7 +490,7 @@ app.get('/api/users/:id', async (req, res) => {
   }
 });
 
-app.get('/api/users/:email/achievements', async (req, res) => {
+app.get('/api/users/:email/achievements', checkUserStatus, async (req, res) => {
   try {
     const { email } = req.params;
     const userRes = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
@@ -476,7 +504,7 @@ app.get('/api/users/:email/achievements', async (req, res) => {
   }
 });
 
-app.post('/api/users/:email/achievements', async (req, res) => {
+app.post('/api/users/:email/achievements', checkUserStatus, async (req, res) => {
   const client = await pool.connect();
   try {
     const { email } = req.params;
@@ -489,7 +517,6 @@ app.post('/api/users/:email/achievements', async (req, res) => {
     const userId = userRes.rows[0].id;
     let currentXp = userRes.rows[0].xp;
     
-    // Check if already unlocked
     const checkRes = await client.query('SELECT id FROM user_achievements WHERE user_id = $1 AND achievement_key = $2', [userId, achievement_key]);
     if (checkRes.rows.length === 0) {
       await client.query('INSERT INTO user_achievements (user_id, achievement_key) VALUES ($1, $2)', [userId, achievement_key]);
@@ -516,7 +543,7 @@ app.post('/api/users/:email/achievements', async (req, res) => {
   }
 });
 
-app.patch('/api/orders/:orderId/cancel', async (req, res) => {
+app.patch('/api/orders/:orderId/cancel', checkUserStatus, async (req, res) => {
   try {
     const { orderId } = req.params;
     const { userEmail } = req.body;

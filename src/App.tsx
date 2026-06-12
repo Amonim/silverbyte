@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { markDailyVisit } from "./utils/profile";
 import Home from "./components/pages/HomePage";
@@ -18,15 +18,39 @@ import AdminProductsPage from "./components/pages/admin/AdminProductsPage";
 import AdminOrdersPage from "./components/pages/admin/AdminOrdersPage";
 import AdminUsersPage from "./components/pages/admin/AdminUsersPage";
 function App() {
+  const [authError, setAuthError] = useState<string | null>(null);
+
   useEffect(() => {
     markDailyVisit();
     const handleAuth = () => markDailyVisit();
+    const handleAuthError = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      setAuthError(customEvent.detail.message);
+      // Wait a moment before redirecting
+      setTimeout(() => {
+        window.location.href = "/login";
+        setAuthError(null);
+      }, 3000);
+    };
+
     window.addEventListener("auth-updated", handleAuth);
-    return () => window.removeEventListener("auth-updated", handleAuth);
+    window.addEventListener("auth-error", handleAuthError);
+    return () => {
+      window.removeEventListener("auth-updated", handleAuth);
+      window.removeEventListener("auth-error", handleAuthError);
+    };
   }, []);
 
   return (
     <BrowserRouter>
+      {authError && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, background: "#ef4444", color: "white",
+          padding: "1rem", textAlign: "center", zIndex: 9999, fontWeight: "bold"
+        }}>
+          {authError}
+        </div>
+      )}
       <ScrollToTop />
       <Routes>
         <Route path="/checkout" element={<CheckoutPage />} />

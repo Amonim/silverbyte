@@ -25,10 +25,8 @@ export default function useProfile() {
         const newStats = calculateProfileStats(apiOrders, backendXP, true, unlockedAchievements);
         setStats(newStats);
 
-        // Check if any achievement was newly completed locally
         const newlyCompleted = newStats.achievements.filter(ach => ach.completed && !unlockedAchievements.includes(ach.id));
         if (newlyCompleted.length > 0) {
-          // Exclude passive achievements like 'purchases_passive' from sending POST requests since they are handled dynamically
           const toUnlock = newlyCompleted.filter(ach => ach.id !== "purchases_passive");
           if (toUnlock.length > 0) {
             let unlockedAny = false;
@@ -37,7 +35,6 @@ export default function useProfile() {
               if (success) unlockedAny = true;
             }
             if (unlockedAny) {
-              // Refetch to get updated XP, level, and achievements list from backend
               const [newOrders, newBackendXP, newUnlocked] = await Promise.all([
                 getUserOrders(user.email),
                 getUserXP(user.email),

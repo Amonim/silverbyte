@@ -1,4 +1,5 @@
 import type { CurrentUser } from '../types/auth'
+import { apiFetch } from './apiClient'
 
 const CURRENT_USER_KEY = 'sb_current_user'
 
@@ -42,7 +43,7 @@ export async function registerUser(
   password: string
 ): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/register`, {
+    const response = await apiFetch(`${API_BASE_URL}/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,7 +83,7 @@ export async function loginUser(
   password: string
 ): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/login`, {
+    const response = await apiFetch(`${API_BASE_URL}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -10,9 +10,11 @@ export interface AdminUser {
   is_blocked?: boolean;
 }
 
+import { apiFetch } from './apiClient';
+
 export const getAdminUsers = async (): Promise<AdminUser[]> => {
   const token = localStorage.getItem('adminToken');
-  const response = await fetch('http://localhost:5000/api/admin/users', {
+  const response = await apiFetch('http://localhost:5000/api/admin/users', {
     headers: { 'Authorization': `Bearer ${token}` }
   });
   if (!response.ok) {
@@ -23,7 +25,7 @@ export const getAdminUsers = async (): Promise<AdminUser[]> => {
 
 export const updateAdminUser = async (id: string | number, data: Partial<AdminUser>): Promise<AdminUser> => {
   const token = localStorage.getItem('adminToken');
-  const response = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+  const response = await apiFetch(`http://localhost:5000/api/admin/users/${id}`, {
     method: 'PATCH',
     headers: { 
       'Content-Type': 'application/json',
@@ -40,7 +42,7 @@ export const updateAdminUser = async (id: string | number, data: Partial<AdminUs
 
 export const blockAdminUser = async (id: string | number): Promise<AdminUser> => {
   const token = localStorage.getItem('adminToken');
-  const response = await fetch(`http://localhost:5000/api/admin/users/${id}/block`, {
+  const response = await apiFetch(`http://localhost:5000/api/admin/users/${id}/block`, {
     method: 'PATCH',
     headers: { 'Authorization': `Bearer ${token}` }
   });
@@ -53,7 +55,7 @@ export const blockAdminUser = async (id: string | number): Promise<AdminUser> =>
 
 export const deleteAdminUser = async (id: string | number): Promise<void> => {
   const token = localStorage.getItem('adminToken');
-  const response = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+  const response = await apiFetch(`http://localhost:5000/api/admin/users/${id}`, {
     method: 'DELETE',
     headers: { 'Authorization': `Bearer ${token}` }
   });
@@ -64,7 +66,7 @@ export const deleteAdminUser = async (id: string | number): Promise<void> => {
 };
 
 export const getUserAchievements = async (email: string): Promise<string[]> => {
-  const response = await fetch(`http://localhost:5000/api/users/${email}/achievements`);
+  const response = await apiFetch(`http://localhost:5000/api/users/${email}/achievements`);
   if (!response.ok) {
     console.error('Failed to fetch achievements');
     return [];
@@ -73,7 +75,7 @@ export const getUserAchievements = async (email: string): Promise<string[]> => {
 };
 
 export const unlockAchievement = async (email: string, achievementKey: string, reward: number): Promise<boolean> => {
-  const response = await fetch(`http://localhost:5000/api/users/${email}/achievements`, {
+  const response = await apiFetch(`http://localhost:5000/api/users/${email}/achievements`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ achievement_key: achievementKey, reward })

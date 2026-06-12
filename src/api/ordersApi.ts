@@ -1,10 +1,11 @@
 import type { Order } from "../types/order";
+import { apiFetch } from "./apiClient";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
 export async function createOrder(order: Order) {
   try {
-    const response = await fetch(`${API_BASE_URL}/orders`, {
+    const response = await apiFetch(`${API_BASE_URL}/orders`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -25,7 +26,7 @@ export async function createOrder(order: Order) {
 
 export async function getUserXP(email: string): Promise<number> {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/${email}`);
+    const response = await apiFetch(`${API_BASE_URL}/users/${email}`);
     if (!response.ok) throw new Error("Failed to fetch user XP");
     const data = await response.json();
     return data.xp || 0;
@@ -37,7 +38,7 @@ export async function getUserXP(email: string): Promise<number> {
 
 export async function getUserOrders(userEmail: string): Promise<Order[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/orders/${userEmail}`);
+    const response = await apiFetch(`${API_BASE_URL}/orders/${userEmail}`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch orders");
@@ -63,7 +64,7 @@ export async function getUserOrders(userEmail: string): Promise<Order[]> {
 
 export async function cancelOrder(orderId: string, userEmail: string): Promise<Order | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/orders/${orderId}/cancel`, {
+    const response = await apiFetch(`${API_BASE_URL}/orders/${orderId}/cancel`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
