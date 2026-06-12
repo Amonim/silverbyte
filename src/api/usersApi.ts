@@ -12,7 +12,8 @@ export interface AdminUser {
 
 import { apiFetch } from './apiClient';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = rawUrl.endsWith('/api') ? rawUrl : `${rawUrl}/api`;
 
 export const getAdminUsers = async (): Promise<AdminUser[]> => {
   const token = localStorage.getItem('adminToken');

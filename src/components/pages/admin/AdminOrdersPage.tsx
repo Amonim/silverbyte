@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 
+const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = rawUrl.endsWith('/api') ? rawUrl : `${rawUrl}/api`;
+
 interface OrderItem {
   id: number;
   order_id: string;
@@ -32,7 +35,7 @@ const AdminOrdersPage = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/orders");
+      const res = await fetch(`${API_BASE_URL}/orders`);
       if (!res.ok) throw new Error("Ошибка при загрузке заказов");
       const data = await res.json();
       setOrders(data);
@@ -51,7 +54,7 @@ const AdminOrdersPage = () => {
     try {
       setActionError("");
       const token = localStorage.getItem("adminToken");
-      const res = await fetch(`http://localhost:5000/api/admin/orders/${id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/admin/orders/${id}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -85,7 +88,7 @@ const AdminOrdersPage = () => {
     setModalLoading(true);
     setSelectedOrder({ id: orderId } as Order);
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}`);
+      const res = await fetch(`${API_BASE_URL}/orders/${orderId}`);
       if (!res.ok) throw new Error("Ошибка загрузки деталей заказа");
       const data = await res.json();
       setSelectedOrder(data);
