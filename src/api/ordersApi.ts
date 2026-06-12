@@ -37,6 +37,17 @@ export async function getUserXP(email: string): Promise<number> {
   }
 }
 
+export async function getUserData(email: string): Promise<any> {
+  try {
+    const response = await apiFetch(`${API_BASE_URL}/users/${email}`);
+    if (!response.ok) throw new Error("Failed to fetch user data");
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return null;
+  }
+}
+
 export async function getUserOrders(userEmail: string): Promise<Order[]> {
   try {
     const response = await apiFetch(`${API_BASE_URL}/orders/${userEmail}`);

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { getUserOrders, getUserXP } from "../api/ordersApi";
+import { getUserOrders, getUserXP, getUserData } from "../api/ordersApi";
 import { getUserAchievements, unlockAchievement } from "../api/usersApi";
 import { calculateProfileStats } from "../utils/profile";
+import { saveCurrentUser } from "../api/authApi";
 import type { Order } from "../types/order";
 import type { ProfileStats } from "../types/profile";
 import useAuth from "./useAuth";
@@ -14,11 +15,20 @@ export default function useProfile() {
   const updateProfileData = async () => {
     if (authenticated && user?.email) {
       try {
-        const [apiOrders, backendXP, unlockedAchievements] = await Promise.all([
+        const [apiOrders, backendXP, unlockedAchievements, backendUserData] = await Promise.all([
           getUserOrders(user.email),
           getUserXP(user.email),
-          getUserAchievements(user.email)
+          getUserAchievements(user.email),
+          getUserData(user.email)
         ]);
+        
+        if (backendUserData && (backendUserData.name !== user.name || backendUserData.email !== user.email)) {
+          saveCurrentUser({
+            ...user,
+            name: backendUserData.name,
+            email: backendUserData.email
+          });
+        }
         
         setOrders(apiOrders);
         
