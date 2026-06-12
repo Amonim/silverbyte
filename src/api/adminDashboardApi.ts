@@ -18,9 +18,11 @@ export interface DashboardData {
   recentOrders: DashboardRecentOrder[];
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 export const getDashboardData = async (): Promise<DashboardData> => {
   const token = localStorage.getItem('adminToken');
-  const response = await fetch('http://localhost:5000/api/admin/dashboard', {
+  const response = await fetch(`${API_URL}/admin/dashboard`, {
     headers: {
       'Authorization': `Bearer ${token}`
     }

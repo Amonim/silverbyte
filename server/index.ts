@@ -6,9 +6,9 @@ import bcrypt from 'bcrypt';
 
 dotenv.config();
 
-const ADMIN_EMAIL = "admin@mail.ru";
-const ADMIN_PASSWORD = "qwerty";
-const ADMIN_TOKEN = "admin-token";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@mail.ru";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "qwerty";
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "admin-token";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
