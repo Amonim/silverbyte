@@ -6,6 +6,7 @@ import FavoriteButton from "../product/FavoriteButton";
 import { markProductViewed } from "../../utils/profile";
 import { getProductById, getProducts } from "../../api/productsApi";
 import type { Product } from "../../data/product";
+import { getCategoryLabel } from "../../utils/categoryHelper";
 
 export default function ProductSection() {
   const { id } = useParams();
@@ -104,7 +105,7 @@ export default function ProductSection() {
             </div>
 
             <div className="product__info">
-              <span className="product__badge">{product.specs.category}</span>
+              <span className="product__badge">{getCategoryLabel(product.category)}</span>
 
               <h1 className="product__title">{product.title}</h1>
 
@@ -139,7 +140,7 @@ export default function ProductSection() {
 
               <div className="product__spec-name">Категория</div>
               <div className="product__spec-value">
-                {product.specs.category}
+                {getCategoryLabel(product.category)}
               </div>
 
               <div className="product__spec-name">Гарантия</div>

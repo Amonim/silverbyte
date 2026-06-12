@@ -46,10 +46,10 @@ export const markProductViewed = (productId: number) => {
 
 export const LEVEL_INFO: Record<number, { prefix: string, discount: number }> = {
   1: { prefix: "Новичок", discount: 0 },
-  2: { prefix: "Активный", discount: 3 },
-  3: { prefix: "Покупатель", discount: 5 },
-  4: { prefix: "Коллекционер", discount: 7 },
-  5: { prefix: "VIP", discount: 10 }
+  2: { prefix: "Покупатель", discount: 2 },
+  3: { prefix: "Активный", discount: 3 },
+  4: { prefix: "Коллекционер", discount: 5 },
+  5: { prefix: "VIP", discount: 7 }
 };
 
 export function getUserRank(level: number): string {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getProducts, createProduct, updateProduct, deleteProduct } from "../../../api/productsApi";
 import type { Product } from "../../../data/product";
+import { getCategoryLabel } from "../../../utils/categoryHelper";
 
 const AdminProductsPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -210,7 +211,7 @@ const AdminProductsPage = () => {
                       <span>{product.title}</span>
                     </div>
                   </td>
-                  <td style={{ textTransform: "capitalize" }}>{product.category}</td>
+                  <td>{getCategoryLabel(product.category)}</td>
                   <td>{product.price.toLocaleString("ru-RU")} ₸</td>
                   <td>
                     <div className="admin-table__actions">

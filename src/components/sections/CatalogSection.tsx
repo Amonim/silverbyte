@@ -4,6 +4,7 @@ import { addToCart } from "../../utils/cart";
 import FavoriteButton from "../product/FavoriteButton";
 import { getProducts } from "../../api/productsApi";
 import type { Product } from "../../data/product";
+import { getCategoryLabel } from "../../utils/categoryHelper";
 
 const PRODUCTS_PER_PAGE = 9;
 
@@ -94,7 +95,7 @@ function CatalogSection() {
         return (
           product.title.toLowerCase().includes(searchQuery) ||
           product.specs.brand.toLowerCase().includes(searchQuery) ||
-          product.specs.category.toLowerCase().includes(searchQuery)
+          getCategoryLabel(product.category).toLowerCase().includes(searchQuery)
         );
       });
     }
