@@ -1,6 +1,7 @@
 import { products as localProducts, type Product } from '../data/product';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = rawUrl.endsWith('/api') ? rawUrl : `${rawUrl}/api`;
 
 export const getProducts = async (): Promise<Product[]> => {
   try {
@@ -16,7 +17,7 @@ export const getProducts = async (): Promise<Product[]> => {
   }
 };
 
-export const getProductById = async (id: number): Promise<Product | undefined> => {
+export const getProductById = async (id: number | string): Promise<Product | undefined> => {
   try {
     const response = await fetch(`${API_URL}/products/${id}`);
     if (!response.ok) {
@@ -27,7 +28,7 @@ export const getProductById = async (id: number): Promise<Product | undefined> =
     return data;
   } catch (error) {
     console.warn(`⚠️ ВНИМАНИЕ: Бэкенд недоступен. Возвращен локальный товар ${id}.`);
-    return localProducts.find((p) => p.id === id);
+    return localProducts.find((p) => String(p.id) === String(id));
   }
 };
 

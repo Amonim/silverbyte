@@ -21,14 +21,14 @@ export default function ProductSection() {
   useEffect(() => {
     const fetchProductData = async () => {
       setIsLoading(true);
-      const productData = await getProductById(Number(id));
+      const productData = await getProductById(id || '');
       if (productData) {
         setProduct(productData);
         const allProducts = await getProducts();
         setRelatedProducts(
           allProducts
             .filter(
-              (item) => item.category === productData.category && item.id !== productData.id,
+              (item) => item.category === productData.category && String(item.id) !== String(productData.id),
             )
             .slice(0, 3)
         );
