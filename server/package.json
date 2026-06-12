@@ -7,7 +7,7 @@
     "dev": "ts-node-dev --respawn --transpile-only index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "migrate": "psql \"$DATABASE_URL\" -f migrations/init.sql"
+    "migrate": "tsx run_migration.ts"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
