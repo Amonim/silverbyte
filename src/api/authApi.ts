@@ -35,7 +35,8 @@ export function isAuthenticated(): boolean {
   return getCurrentUser() !== null
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = rawUrl.endsWith('/api') ? rawUrl : `${rawUrl}/api`;
 
 export async function registerUser(
   name: string,
