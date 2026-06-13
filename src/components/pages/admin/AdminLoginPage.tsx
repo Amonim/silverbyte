@@ -30,7 +30,7 @@ const AdminLoginPage = () => {
       } else {
         setError(data.message || "Неверный email или пароль");
       }
-    } catch (err) {
+    } catch {
       setError("Ошибка соединения с сервером");
     }
   };

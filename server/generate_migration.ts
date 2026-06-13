@@ -92,7 +92,7 @@ END $$;
 `;
 
     fs.writeFileSync(sqlFile, sql);
-    console.log('Migration generated successfully at ' + sqlFile);
+
   } catch (e) {
     console.error(e);
   } finally {

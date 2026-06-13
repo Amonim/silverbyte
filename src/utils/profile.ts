@@ -37,7 +37,7 @@ export const markProductViewed = (productId: number) => {
       localStorage.setItem(key, JSON.stringify(viewed));
       window.dispatchEvent(new Event("profile-updated"));
     }
-  } catch (e) {
+  } catch {
     localStorage.setItem(key, JSON.stringify([productId]));
     window.dispatchEvent(new Event("profile-updated"));
   }
@@ -77,7 +77,7 @@ export function calculateProfileStats(
       const viewedStr = localStorage.getItem(getTrackingKey("viewed_products"));
       const viewed = viewedStr ? JSON.parse(viewedStr) : [];
       viewedProducts = Array.isArray(viewed) ? viewed.length : 0;
-    } catch (e) {
+    } catch {
       viewedProducts = 0;
     }
   }

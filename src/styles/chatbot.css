@@ -333,7 +333,7 @@
   }
 }
 
-/* Light Theme Support */
+
 [data-theme="light"] .chatbot-panel--modern {
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04);
 }

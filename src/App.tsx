@@ -26,7 +26,7 @@ function App() {
     const handleAuthError = (e: Event) => {
       const customEvent = e as CustomEvent;
       setAuthError(customEvent.detail.message);
-      // Wait a moment before redirecting
+
       setTimeout(() => {
         window.location.href = "/login";
         setAuthError(null);
@@ -63,7 +63,7 @@ function App() {
         <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
 
-        {/* Admin Routes */}
+
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboardPage />} />

@@ -11,7 +11,7 @@ export const getProducts = async (): Promise<Product[]> => {
     }
     const data = await response.json();
     return data;
-  } catch (error) {
+  } catch {
     console.warn('⚠️ ВНИМАНИЕ: Бэкенд недоступен. Используются локальные (fallback) данные товаров. Изменения не будут сохранены в БД.');
     return localProducts;
   }
@@ -26,7 +26,7 @@ export const getProductById = async (id: number | string): Promise<Product | und
     }
     const data = await response.json();
     return data;
-  } catch (error) {
+  } catch {
     console.warn(`⚠️ ВНИМАНИЕ: Бэкенд недоступен. Возвращен локальный товар ${id}.`);
     return localProducts.find((p) => String(p.id) === String(id));
   }

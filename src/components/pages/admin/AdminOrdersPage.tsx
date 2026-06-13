@@ -104,7 +104,7 @@ const AdminOrdersPage = () => {
     if (!info) return {};
     try {
       return typeof info === "string" ? JSON.parse(info) : info;
-    } catch (e) {
+    } catch {
       return {};
     }
   };

@@ -11,7 +11,7 @@ async function migrate() {
         UNIQUE(user_id, achievement_key)
       );
     `);
-    console.log("Migration successful: user_achievements table ready.");
+
   } catch (err) {
     console.error("Migration failed:", err);
   } finally {
