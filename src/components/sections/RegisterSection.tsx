@@ -30,6 +30,11 @@ function RegisterSection() {
       return;
     }
 
+        if (password.length > 6) {
+      setError("пароль менее 6 символов");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
