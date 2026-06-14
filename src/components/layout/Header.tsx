@@ -118,7 +118,7 @@ function Header() {
             </Link>
 
             <Link to="/cart" className="header-link header__cart">
-              орзина
+              Корзина
               {count > 0 && <span className="header__cart-badge">{count}</span>}
             </Link>
 
